@@ -4,8 +4,11 @@ Originally developed during my work at [RIPE NCC](http://ripe.net), we needed an
 
 * was high performance
 * had minimal memory footprint
-* supported complex operations
+* supported addresses, ranges, prefixes
+* supported contains/intersect operations
 * had a natural tree support
+* supported IPv4 and IPv6 in a protocol-independent manner
+* supported in-addr.arpa/ip6.arpa (a.k.a. reverse domain) format
 
 While this was working well, this little gem was never released in public. Now I've removed the whois-specific parts and packaged it for maven central.
 

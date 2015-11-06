@@ -28,6 +28,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("212.219.1.0 - 212.219.1.255");
         assertThat(subject.begin(), eq(3571122432L));
         assertThat(subject.end(), eq(3571122687L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {(byte)212,(byte)219,1,0}));
     }
 
     @Test
@@ -35,6 +36,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("212.219.1.0");
         assertThat(subject.begin(), eq(3571122432L));
         assertThat(subject.end(), eq(3571122432L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {(byte)212,(byte)219,1,0}));
     }
 
     @Test
@@ -42,6 +44,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("212.219.1.0/24");
         assertThat(subject.begin(), eq(3571122432L));
         assertThat(subject.end(), eq(3571122687L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {(byte)212,(byte)219,1,0}));
     }
 
     @Test
@@ -49,6 +52,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("212.219.1.0/24\r\n");
         assertThat(subject.begin(), eq(3571122432L));
         assertThat(subject.end(), eq(3571122687L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {(byte)212,(byte)219,1,0}));
     }
 
     @Test
@@ -56,6 +60,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("151.64.0.1/21\r\n");
         assertThat(subject.begin(), eq(2537553920L));
         assertThat(subject.end(), eq(2537555967L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {(byte)151,64,0,0}));
     }
 
     @Test
@@ -63,6 +68,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("109.73.65.0/23\r\n");
         assertThat(subject.begin(), eq(1833517056L));
         assertThat(subject.end(), eq(1833517567L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {109,73,64,0}));
     }
 
     @Test
@@ -70,6 +76,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("62.219.43.72/28\r\n");
         assertThat(subject.begin(), eq(1054550848L));
         assertThat(subject.end(), eq(1054550863L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {62,(byte)219,43,64}));
     }
 
     @Test
@@ -77,6 +84,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("162.219.43.72/31\r\n");
         assertThat(subject.begin(), eq(2732272456L));
         assertThat(subject.end(), eq(2732272457L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {(byte)162,(byte)219,43,72}));
     }
 
     @Test
@@ -84,6 +92,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("162.219.43.72/32\r\n");
         assertThat(subject.begin(), eq(2732272456L));
         assertThat(subject.end(), eq(2732272456L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {(byte)162,(byte)219,43,72}));
     }
 
     @Test
@@ -91,6 +100,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("0/32\r\n");
         assertThat(subject.begin(), eq(0L));
         assertThat(subject.end(), eq(0L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {0,0,0,0}));
     }
 
     @Test
@@ -98,6 +108,7 @@ public class Ipv4ResourceTest {
         subject = Ipv4Resource.parse("0/0\r\n");
         assertThat(subject.begin(), eq(0L));
         assertThat(subject.end(), eq(4294967295L));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {0,0,0,0}));
     }
 
     @Test(expected = IllegalArgumentException.class)

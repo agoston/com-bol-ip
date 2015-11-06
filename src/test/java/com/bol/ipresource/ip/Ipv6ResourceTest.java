@@ -23,6 +23,7 @@ public class Ipv6ResourceTest {
         subject = Ipv6Resource.parse("::f000/116");
         assertThat(subject.begin(), is(BigInteger.valueOf(61440)));
         assertThat(subject.end(), is(BigInteger.valueOf(65535)));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,(byte)0xf0,0}));
     }
 
     @Test
@@ -30,6 +31,7 @@ public class Ipv6ResourceTest {
         subject = Ipv6Resource.parse("::2001");
         assertThat(subject.begin(), is(BigInteger.valueOf(8193)));
         assertThat(subject.end(), is(BigInteger.valueOf(8193)));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0x20,0x01}));
     }
 
     @Test
@@ -37,6 +39,7 @@ public class Ipv6ResourceTest {
         subject = Ipv6Resource.parse("2001::/64");
         assertThat(subject.begin(), is(new BigInteger("42540488161975842760550356425300246528")));
         assertThat(subject.end(), is(new BigInteger("42540488161975842778997100499009798143")));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {0x20,0x01,0,0,0,0,0,0,0,0,0,0,0,0,0,0}));
     }
 
     @Test
@@ -44,6 +47,7 @@ public class Ipv6ResourceTest {
         subject = Ipv6Resource.parse("2a00:1f78::fffe/48");
         assertThat(subject.begin(), is(new BigInteger("55828214085043681575463550121838379008")));
         assertThat(subject.end(), is(new BigInteger("55828214085044890501283164751013085183")));
+        assertThat(subject.beginAsByteArray(), is(new byte[] {0x2a,0,0x1f,0x78,0,0,0,0,0,0,0,0,0,0,0,0}));
     }
 
     @Test

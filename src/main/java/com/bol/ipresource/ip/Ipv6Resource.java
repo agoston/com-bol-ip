@@ -10,7 +10,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
-public class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comparable<Ipv6Resource> {
+/**
+ * Efficient representation of an IPv6 address range. Internally IPv6 addresses
+ * are stored as 2 signed 64-bit <code>long</code>s.
+ */
+public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comparable<Ipv6Resource> {
     public static final String IPV6_REVERSE_DOMAIN = ".ip6.arpa";
 
     private static final int LONG_BITCOUNT = 64;
@@ -113,7 +117,7 @@ public class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comparable
         if (slashIndex > 0) {
             int prefixLength = Integer.parseInt(trimmedPrefixOrAddress.substring(slashIndex + 1));
             if (prefixLength < 0 || prefixLength > 128) {
-                throw new IllegalArgumentException("Invalid prefix length: "+prefixOrAddress);
+                throw new IllegalArgumentException("Invalid prefix length: " + prefixOrAddress);
             }
             return parse(InetAddresses.forString(trimmedPrefixOrAddress.substring(0, slashIndex)), prefixLength);
         } else {
@@ -249,6 +253,11 @@ public class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comparable
             // this will never happen
             return null;
         }
+    }
+
+    @Override
+    public byte[] beginAsByteArray() {
+        return toByteArray(beginMsb, beginLsb);
     }
 
     @Override

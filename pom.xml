@@ -8,6 +8,27 @@
     <packaging>jar</packaging>
     <name>ip-resource</name>
     <version>1.0</version>
+    <description>High performance, low memory IP library (originally developed for RIPE NCC Whois server)</description>
+    <url>https://github.com/agoston/com-bol-ip</url>
+    <licenses>
+        <license>
+            <name>BSD</name>
+            <url>https://opensource.org/licenses/BSD-3-Clause</url>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/agoston/com-bol-ip</url>
+    </scm>
+    <developers>
+        <developer>
+            <name>Ágoston Horváth</name>
+            <url>github.com/agoston</url>
+            <email>ahorvath@bol.com</email>
+            <organization>bol.com</organization>
+            <timezone>1</timezone>
+            <organizationUrl>http://bol.com</organizationUrl>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>

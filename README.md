@@ -22,7 +22,7 @@ Add the following to `pom.xml`:
 
 ```
         <dependency>
-            <groupId>com.bol.ip</groupId>
+            <groupId>com.bol</groupId>
             <artifactId>ip-resource</artifactId>
             <version>1.0</version>
         </dependency>

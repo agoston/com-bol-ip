@@ -18,7 +18,15 @@ Inherited the BSD license of the original project.
 
 # Usage
 
-Coming soon
+Add the following to `pom.xml`:
+
+```
+        <dependency>
+            <groupId>com.bol.ip</groupId>
+            <artifactId>ip-resource</artifactId>
+            <version>1.0</version>
+        </dependency>
+```
 
 # Examples
 

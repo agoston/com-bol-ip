@@ -34,14 +34,14 @@ Ipv4Resource and Ipv6Resource objects are immutable.
 
 To parse an IPv4 interval:
 ```java
-Ipv4Resource myRange = Ipv4Resource.parse("192.168/19")
+        Ipv4Resource myRange = Ipv4Resource.parse("192.168/19")
 ```
 
 To work with ranges/interval:
 ```java
-myRange.contains(Ipv4Resource.parse("10/8"));            // false
-myRange.contains(Ipv4Resource.parse("192.168.1.1");      // true
-myRange.intersects(Ipv4Resource.parse("192.168.7.0 - 192.168.7.7"));    // true
+        myRange.contains(Ipv4Resource.parse("10/8"));            // false
+        myRange.contains(Ipv4Resource.parse("192.168.1.1");      // true
+        myRange.intersects(Ipv4Resource.parse("192.168.7.0 - 192.168.7.7"));    // true
 ```
 
 To use highly efficient IP interval trees:

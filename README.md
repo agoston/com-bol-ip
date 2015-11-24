@@ -30,4 +30,30 @@ Add the following to `pom.xml`:
 
 # Examples
 
-Coming soon
+Ipv4Resource and Ipv6Resource objects are immutable.
+
+To parse an IPv4 interval:
+```java
+Ipv4Resource myRange = Ipv4Resource.parse("192.168/19")
+```
+
+To work with ranges/interval:
+```java
+myRange.contains(Ipv4Resource.parse("10/8"));            // false
+myRange.contains(Ipv4Resource.parse("192.168.1.1");      // true
+myRange.intersects(Ipv4Resource.parse("192.168.7.0 - 192.168.7.7"));    // true
+```
+
+To use highly efficient IP interval trees:
+```java
+        [...]
+        // create & populate whitelist/blacklist tree
+        NestedIntervalMap<Ipv4Resource, Boolean> map = new NestedIntervalMap<>();
+        map.put(Ipv4Resource.parse("192.168/19"), true);
+        map.put(Ipv4Resource.parse("192.168.52.1"), false);
+        map.put(Ipv4Resource.parse("0/0"), false);
+
+        // lookup if incoming IP is allowed to connect
+        boolean allow = map.findFirstLessSpecific(new Ipv4Resource(new Socket().getInetAddress()));
+        [...]
+```

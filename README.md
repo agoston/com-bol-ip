@@ -44,7 +44,7 @@ To work with ranges/interval:
         myRange.intersects(Ipv4Resource.parse("192.168.7.0 - 192.168.7.7"));    // true
 ```
 
-To use highly efficient IP interval trees:
+To use highly efficient IP interval trees for access control:
 ```java
         [...]
         // create & populate whitelist/blacklist tree
@@ -54,6 +54,9 @@ To use highly efficient IP interval trees:
         map.put(Ipv4Resource.parse("0/0"), false);
 
         // lookup if incoming IP is allowed to connect
-        boolean allow = map.findFirstLessSpecific(new Ipv4Resource(new Socket().getInetAddress()));
+        boolean allow = map.findFirstLessSpecific(new Ipv4Resource(incomingSocket));
         [...]
 ```
+The above code would first build an IP tree where default is not allowed to connect (`false`), range `192.168/19` is allowed (`true`), but inside that range, `192.168.52.1` is excluded once more (`false`). Then we use the `findFirstLessSpecific()` method of the tree on a connecting client's IP address to find the best match for its IP.
+
+Of course this is just a small example, there is full IPv6 support & a lot more hierarchical lookup support, feel free to peek inside!

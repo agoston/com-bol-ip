@@ -54,7 +54,7 @@ To use highly efficient IP interval trees for access control:
         map.put(Ipv4Resource.parse("0/0"), false);
 
         // lookup if incoming IP is allowed to connect
-        boolean allow = map.findFirstLessSpecific(new Ipv4Resource(incomingSocket));
+        boolean allow = map.findFirstLessSpecific(new Ipv4Resource(incomingSocket.getInetAddress()));
         [...]
 ```
 The above code would first build an IP tree where default is not allowed to connect (`false`), range `192.168/19` is allowed (`true`), but inside that range, `192.168.52.1` is excluded once more (`false`). Then we use the `findFirstLessSpecific()` method of the tree on a connecting client's IP address to find the best match for its IP.

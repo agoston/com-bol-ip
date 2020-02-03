@@ -16,39 +16,28 @@ import java.util.regex.Pattern;
  */
 public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comparable<Ipv6Resource> {
     public static final String IPV6_REVERSE_DOMAIN = ".ip6.arpa";
+    private static final Pattern REVERSE_PATTERN = Pattern.compile("(?i)^[0-9a-f](?:[.][0-9a-f]){0,31}$");
 
     private static final int LONG_BITCOUNT = 64;
     private static final int IPV6_BITCOUNT = 128;
 
     public static final Ipv6Resource MAX_RANGE = new Ipv6Resource(0, 0, 0);
-
     private static final BigInteger MASK = BigInteger.ONE.shiftLeft(LONG_BITCOUNT).subtract(BigInteger.ONE);
-
-    private static final Pattern REVERSE_PATTERN = Pattern.compile("(?i)^[0-9a-f](?:[.][0-9a-f]){0,31}$");
 
     private final long beginMsb;
     private final long beginLsb;
     private final long endMsb;
     private final long endLsb;
 
-    private Ipv6Resource(final BigInteger begin, final int len) {
+    public Ipv6Resource(BigInteger begin, int len) {
         this(msb(begin), lsb(begin), len);
     }
 
-    public static long lsb(final BigInteger begin) {
-        return begin.and(MASK).longValue();
+    public Ipv6Resource(String msb, String lsb, int len) {
+        this(new BigInteger(msb).shiftLeft(LONG_BITCOUNT).add(new BigInteger(lsb)), len);
     }
 
-    public static long msb(final BigInteger begin) {
-        return begin.shiftRight(LONG_BITCOUNT).longValue();
-    }
-
-    public static Ipv6Resource parseFromStrings(final String msb, final String lsb, final int len) {
-        final BigInteger begin = new BigInteger(msb).shiftLeft(LONG_BITCOUNT).add(new BigInteger(lsb));
-        return new Ipv6Resource(begin, len);
-    }
-
-    private Ipv6Resource(final long msb, final long lsb, final int prefixLength) {
+    public Ipv6Resource(long msb, long lsb, int prefixLength) {
         // Special cases -- short circuit
         if (prefixLength == 0) {
             beginMsb = 0;
@@ -70,7 +59,7 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
             return;
         }
 
-        final long mask = (1L << (LONG_BITCOUNT - (prefixLength % LONG_BITCOUNT))) - 1;
+        long mask = (1L << (LONG_BITCOUNT - (prefixLength % LONG_BITCOUNT))) - 1;
 
         if (prefixLength < LONG_BITCOUNT) {
             beginLsb = 0;
@@ -87,7 +76,7 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         }
     }
 
-    public Ipv6Resource(final BigInteger begin, final BigInteger end) {
+    public Ipv6Resource(BigInteger begin, BigInteger end) {
         Validate.isTrue(begin.bitLength() <= IPV6_BITCOUNT, "Begin out of range: ", begin);
         Validate.isTrue(end.bitLength() <= IPV6_BITCOUNT, "End out of range: ", end);
 
@@ -99,20 +88,18 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         Validate.isTrue(compare(beginMsb, beginLsb, endMsb, endLsb) <= 0, "Begin must be before end");
     }
 
-    public static Ipv6Resource parse(final InetAddress ipv6Address) {
-        final long[] res = byteArrayToLongArray(ipv6Address.getAddress());
-        return new Ipv6Resource(res[0], res[1], IPV6_BITCOUNT);
+    public static Ipv6Resource parse(InetAddress ipv6Address) {
+        return parse(ipv6Address, IPV6_BITCOUNT);
     }
 
-    private static Ipv6Resource parse(final InetAddress ipv6Address, final int prefixLength) {
-        final long[] res = byteArrayToLongArray(ipv6Address.getAddress());
+    public static Ipv6Resource parse(InetAddress ipv6Address, int prefixLength) {
+        long[] res = byteArrayToLongArray(ipv6Address.getAddress());
         return new Ipv6Resource(res[0], res[1], prefixLength);
     }
 
-    public static Ipv6Resource parse(final String prefixOrAddress) {
-        Validate.notNull(prefixOrAddress);
-        final String trimmedPrefixOrAddress = prefixOrAddress.trim();
-        final int slashIndex = trimmedPrefixOrAddress.indexOf('/');
+    public static Ipv6Resource parse(String prefixOrAddress) {
+        String trimmedPrefixOrAddress = prefixOrAddress.trim();
+        int slashIndex = trimmedPrefixOrAddress.indexOf('/');
 
         if (slashIndex > 0) {
             int prefixLength = Integer.parseInt(trimmedPrefixOrAddress.substring(slashIndex + 1));
@@ -125,7 +112,7 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         }
     }
 
-    public static Ipv6Resource parseReverseDomain(final String address) {
+    public static Ipv6Resource parseReverseDomain(String address) {
         Validate.notEmpty(address, "Address cannot be empty");
         String cleanAddress = removeTrailingDot(address.trim()).toLowerCase();
 
@@ -135,7 +122,7 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
 
         Validate.isTrue(REVERSE_PATTERN.matcher(cleanAddress).matches(), "Invalid reverse domain: ", address);
 
-        final StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         int netmask = 0;
 
         for (int index = cleanAddress.length() - 1; index >= 0; index -= 2) {
@@ -172,9 +159,9 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         return twoUnsignedLongToBigInteger(endMsb, endLsb);
     }
 
-    private static long[] byteArrayToLongArray(final byte[] address) {
+    private static long[] byteArrayToLongArray(byte[] address) {
         Validate.isTrue(address.length == 16, "Address has to be 16 bytes long");
-        final long[] res = new long[2];
+        long[] res = new long[2];
 
         for (int i = 0; i < 16; i++) {
             res[i >>> 3] = (res[i >>> 3] << 8) + (address[i] & 0xFF);
@@ -182,8 +169,8 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         return res;
     }
 
-    private static byte[] toByteArray(final long msb, final long lsb) {
-        final byte[] data = new byte[16];
+    private static byte[] toByteArray(long msb, long lsb) {
+        byte[] data = new byte[16];
 
         for (int i = 0; i < 16; i++) {
             data[i] = (byte) ((i < 8 ? msb : lsb) >>> (8 * (7 - (i % 8))) & 0xFF);
@@ -191,11 +178,11 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         return data;
     }
 
-    private static BigInteger twoUnsignedLongToBigInteger(final long msb, final long lsb) {
+    private static BigInteger twoUnsignedLongToBigInteger(long msb, long lsb) {
         return new BigInteger(1, toByteArray(msb, lsb));
     }
 
-    public static int compare(final long aMsb, final long aLsb, final long bMsb, final long bLsb) {
+    public static int compare(long aMsb, long aLsb, long bMsb, long bLsb) {
         if (aMsb == bMsb) {
             if (aLsb == bLsb) {
                 return 0;
@@ -211,7 +198,7 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
     }
 
     @Override
-    public int compareTo(final Ipv6Resource that) {
+    public int compareTo(Ipv6Resource that) {
         int comp = compare(beginMsb, beginLsb, that.beginMsb, that.beginLsb);
         if (comp == 0) {
             comp = compare(that.endMsb, that.endLsb, endMsb, endLsb);
@@ -220,13 +207,13 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
     }
 
     @Override
-    public boolean contains(final Ipv6Resource that) {
+    public boolean contains(Ipv6Resource that) {
         return compare(beginMsb, beginLsb, that.beginMsb, that.beginLsb) <= 0
                 && compare(endMsb, endLsb, that.endMsb, that.endLsb) >= 0;
     }
 
     @Override
-    public boolean intersects(final Ipv6Resource that) {
+    public boolean intersects(Ipv6Resource that) {
         return (compare(beginMsb, beginLsb, that.beginMsb, that.beginLsb) >= 0 && compare(beginMsb, beginLsb, that.endMsb, that.endLsb) <= 0)
                 || (compare(endMsb, endLsb, that.beginMsb, that.beginLsb) >= 0 && compare(endMsb, endLsb, that.endMsb, that.endLsb) <= 0)
                 || contains(that);
@@ -238,13 +225,13 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
     }
 
     @Override
-    public int compareUpperBound(final Ipv6Resource that) {
+    public int compareUpperBound(Ipv6Resource that) {
         return compare(endMsb, endLsb, that.endMsb, that.endLsb);
     }
 
     @Override
     public InetAddress beginAsInetAddress() {
-        final byte[] bytes = new byte[16];
+        byte[] bytes = new byte[16];
         System.arraycopy(Longs.toByteArray(beginMsb), 0, bytes, 8, 8);
         System.arraycopy(Longs.toByteArray(beginLsb), 0, bytes, 0, 8);
         try {
@@ -273,16 +260,16 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
 
     @Override
     public String toString() {
-        final int prefixLength = getPrefixLength();
-        final int[] nibbles = new int[8];
+        int prefixLength = getPrefixLength();
+        int[] nibbles = new int[8];
         int maxZeroIndex = -1, maxZeroCount = -1;
         int actZeroIndex = -1, actZeroCount = 0;
         StringBuilder sb = new StringBuilder();
 
         // convert to nibbles, mark location of longest nibble
         for (int i = 0; i < prefixLength; i += 16) {
-            final long act = (i < LONG_BITCOUNT) ? beginMsb : beginLsb;
-            final int remainingPrefix = prefixLength - i;
+            long act = (i < LONG_BITCOUNT) ? beginMsb : beginLsb;
+            int remainingPrefix = prefixLength - i;
             int mask = 0xFFFF;
 
             if (remainingPrefix < 16) {
@@ -351,7 +338,7 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -364,4 +351,13 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         Ipv6Resource other = (Ipv6Resource) obj;
         return compareTo(other) == 0;
     }
+
+    public static long lsb(BigInteger begin) {
+        return begin.and(MASK).longValue();
+    }
+
+    public static long msb(BigInteger begin) {
+        return begin.shiftRight(LONG_BITCOUNT).longValue();
+    }
+
 }

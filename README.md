@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/com.bol/ip-resource.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.bol)
+
 # IP Resource origins
 
 Originally developed during my work at [RIPE NCC](http://ripe.net), we needed an IP library for the [WHOIS server](http://github.com/RIPE-NCC/whois) that
@@ -24,7 +26,7 @@ Add the following to `pom.xml`:
         <dependency>
             <groupId>com.bol</groupId>
             <artifactId>ip-resource</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
 ```
 

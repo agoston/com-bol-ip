@@ -83,7 +83,10 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
         int indexOfSlash = resource.indexOf('/');
         if (indexOfSlash >= 0) {
             int begin = textToNumericFormat(resource.substring(0, indexOfSlash).trim());
-            int prefixLength = Integer.parseInt(resource.substring(indexOfSlash + 1).trim());
+            int prefixLength = -1;
+            try {
+                prefixLength = Integer.parseInt(resource.substring(indexOfSlash + 1).trim());
+            } catch (NumberFormatException e) {}
             if (prefixLength < 0 || prefixLength > 32) {
                 throw new IllegalArgumentException("prefix length " + prefixLength + " is invalid");
             }
@@ -230,7 +233,10 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
         Iterator<String> it = IPV4_TEXT_SPLITTER.split(src).iterator();
         for (int octet = 0; octet < 4; octet++) {
             result <<= 8;
-            int value = it.hasNext() ? Integer.parseInt(it.next()) : 0;
+            int value = -1;
+            try {
+                value = it.hasNext() ? Integer.parseInt(it.next()) : 0;
+            } catch (NumberFormatException e) {}
             if (value < 0 || value > 255) {
                 throw new IllegalArgumentException(src + " is not a valid ipv4 address");
             }

@@ -102,7 +102,10 @@ public final class Ipv6Resource extends IpInterval<Ipv6Resource> implements Comp
         int slashIndex = trimmedPrefixOrAddress.indexOf('/');
 
         if (slashIndex > 0) {
-            int prefixLength = Integer.parseInt(trimmedPrefixOrAddress.substring(slashIndex + 1));
+            int prefixLength = -1;
+            try {
+                prefixLength = Integer.parseInt(trimmedPrefixOrAddress.substring(slashIndex + 1));
+            } catch (NumberFormatException e) {}
             if (prefixLength < 0 || prefixLength > 128) {
                 throw new IllegalArgumentException("Invalid prefix length: " + prefixOrAddress);
             }

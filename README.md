@@ -51,7 +51,7 @@ To use highly efficient IP interval trees for access control:
 ```java
         [...]
         // create & populate whitelist/blacklist tree
-        NestedIntervalMap<Ipv4Resource, Boolean> map = new NestedIntervalMap<>();
+        NestedIntervalMap<Ipv4Interval, Boolean> map = new NestedIntervalMap<>();
         map.put(Ipv4Interval.parse("192.168/19"), true);
         map.put(Ipv4Interval.parse("192.168.52.1"), false);
         map.put(Ipv4Interval.parse("0/0"), false);

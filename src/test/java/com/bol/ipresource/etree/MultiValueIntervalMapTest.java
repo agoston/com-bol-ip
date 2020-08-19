@@ -1,7 +1,6 @@
 package com.bol.ipresource.etree;
 
-import com.bol.ipresource.etree.MultiValueIntervalMap;
-import com.bol.ipresource.ip.Ipv4Resource;
+import com.bol.ipresource.ip.Ipv4Interval;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,11 +11,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 
 public class MultiValueIntervalMapTest {
-    private MultiValueIntervalMap<Ipv4Resource, String> subject;
-    private Ipv4Resource k_11;
-    private Ipv4Resource k_12;
-    private Ipv4Resource k_13;
-    private Ipv4Resource k_14;
+    private MultiValueIntervalMap<Ipv4Interval, String> subject;
+    private Ipv4Interval k_11;
+    private Ipv4Interval k_12;
+    private Ipv4Interval k_13;
+    private Ipv4Interval k_14;
 
     private String v_11 = "1-1";
     private String v_121 = "1-2 1";
@@ -29,10 +28,10 @@ public class MultiValueIntervalMapTest {
     public void setUp() throws Exception {
         subject = new MultiValueIntervalMap<>();
 
-        k_11 = new Ipv4Resource(1, 1);
-        k_12 = new Ipv4Resource(1, 2);
-        k_13 = new Ipv4Resource(1, 3);
-        k_14 = new Ipv4Resource(1, 4);
+        k_11 = new Ipv4Interval(1, 1);
+        k_12 = new Ipv4Interval(1, 2);
+        k_13 = new Ipv4Interval(1, 3);
+        k_14 = new Ipv4Interval(1, 4);
 
         subject.put(k_11, v_11);
 
@@ -77,7 +76,7 @@ public class MultiValueIntervalMapTest {
     @Test
     public void remove_with_value_key_unknown() {
         subject.remove(k_14, v_11);
-        final List<String> result = subject.findAllMoreSpecific(Ipv4Resource.MAX_RANGE);
+        final List<String> result = subject.findAllMoreSpecific(Ipv4Interval.MAX_RANGE);
         assertThat(result, contains(v_131, v_132, v_133, v_121, v_122, v_11));
     }
 
@@ -85,7 +84,7 @@ public class MultiValueIntervalMapTest {
     public void clear() {
         subject.clear();
 
-        final List<String> result = subject.findAllMoreSpecific(Ipv4Resource.MAX_RANGE);
+        final List<String> result = subject.findAllMoreSpecific(Ipv4Interval.MAX_RANGE);
         assertThat(result, hasSize(0));
     }
 
@@ -127,7 +126,7 @@ public class MultiValueIntervalMapTest {
 
     @Test
     public void findAllMoreSpecific() {
-        final List<String> result = subject.findAllMoreSpecific(Ipv4Resource.MAX_RANGE);
+        final List<String> result = subject.findAllMoreSpecific(Ipv4Interval.MAX_RANGE);
         assertThat(result, contains(v_131, v_132, v_133, v_121, v_122, v_11));
     }
 

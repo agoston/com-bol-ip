@@ -1,6 +1,6 @@
 package com.bol.ipresource.etree;
 
-import com.bol.ipresource.ip.Ipv4Resource;
+import com.bol.ipresource.ip.Ipv4Interval;
 import com.bol.ipresource.util.Validate;
 import com.google.common.collect.Lists;
 import org.junit.Test;
@@ -18,13 +18,13 @@ import static org.junit.Assert.assertThat;
 
 public class NestedIntervalMapNonLookupTest {
 
-    private static final Map<String, Ipv4Resource> cache = new HashMap<>();
+    private static final Map<String, Ipv4Interval> cache = new HashMap<>();
 
-    private static final Ipv4Resource node(Object toStringify) {
+    private static final Ipv4Interval node(Object toStringify) {
         return node(toStringify.toString());
     }
 
-    private static final Ipv4Resource node(String node) {
+    private static final Ipv4Interval node(String node) {
         Validate.isTrue(cache.containsKey(node), "Node " + node + " not in cache");
         return cache.get(node);
     }
@@ -32,7 +32,7 @@ public class NestedIntervalMapNonLookupTest {
     static {
         for (int i = 0; i <= 10; i++) {
             for (int j = i; j <= 10; j++) {
-                Ipv4Resource resource = new Ipv4Resource(i, j);
+                Ipv4Interval resource = new Ipv4Interval(i, j);
                 cache.put(String.format("%d-%d", i, j), resource);
                 if (i == j) {
                     cache.put(Integer.toString(i), resource);
@@ -41,13 +41,13 @@ public class NestedIntervalMapNonLookupTest {
         }
     }
 
-    private NestedIntervalMap<Ipv4Resource, Ipv4Resource> subject = new NestedIntervalMap<>();
+    private NestedIntervalMap<Ipv4Interval, Ipv4Interval> subject = new NestedIntervalMap<>();
 
-    private List<Ipv4Resource> allNodes() {
-        return subject.findAllMoreSpecific(Ipv4Resource.MAX_RANGE);
+    private List<Ipv4Interval> allNodes() {
+        return subject.findAllMoreSpecific(Ipv4Interval.MAX_RANGE);
     }
 
-    private Ipv4Resource add(Ipv4Resource node) {
+    private Ipv4Interval add(Ipv4Interval node) {
         subject.put(node, node);
         return node;
     }
@@ -60,7 +60,7 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addSingleEntryNode() {
-        Ipv4Resource node = node(1);
+        Ipv4Interval node = node(1);
         add(node);
 
         assertThat(allNodes(), hasSize(1));
@@ -69,7 +69,7 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addRangedNode() {
-        Ipv4Resource node = node("1-2");
+        Ipv4Interval node = node("1-2");
         add(node);
 
         assertThat(allNodes(), hasSize(1));
@@ -79,8 +79,8 @@ public class NestedIntervalMapNonLookupTest {
     /* Siblings - root - simple */
     @Test
     public void addSiblingToRoot() {
-        Ipv4Resource node1 = add(node(1));
-        Ipv4Resource node2 = add(node(2));
+        Ipv4Interval node1 = add(node(1));
+        Ipv4Interval node2 = add(node(2));
 
         assertThat(allNodes(), hasSize(2));
         assertNotNull(subject.findExact(node1));
@@ -90,7 +90,7 @@ public class NestedIntervalMapNonLookupTest {
     @Test
     public void addSiblingRangeLeftOfExisting() {
         add(node("3-4"));
-        Ipv4Resource node = add(node("1-2"));
+        Ipv4Interval node = add(node("1-2"));
 
         assertThat(allNodes(), hasSize(2));
         assertNotNull(subject.findExact(node));
@@ -100,7 +100,7 @@ public class NestedIntervalMapNonLookupTest {
     @Test
     public void addSiblingRangeRightOfExisting() {
         add(node("1-2"));
-        Ipv4Resource node = add(node("3-4"));
+        Ipv4Interval node = add(node("3-4"));
 
         assertThat(allNodes(), hasSize(2));
         assertNotNull(subject.findExact(node));
@@ -111,7 +111,7 @@ public class NestedIntervalMapNonLookupTest {
     public void addSiblingRangeBetweenExisting() {
         add(node("1-2"));
         add(node("5-6"));
-        Ipv4Resource node = add(node("3-4"));
+        Ipv4Interval node = add(node("3-4"));
 
         assertThat(allNodes(), hasSize(3));
         assertNotNull(subject.findExact(node));
@@ -121,8 +121,8 @@ public class NestedIntervalMapNonLookupTest {
     /* Children */
     @Test
     public void addChild() {
-        Ipv4Resource parent = add(node("1-10"));
-        Ipv4Resource node = add(node("2"));
+        Ipv4Interval parent = add(node("1-10"));
+        Ipv4Interval node = add(node("2"));
 
         assertThat(allNodes(), hasSize(2));
         assertNotNull(subject.findExact(node));
@@ -133,9 +133,9 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addChildToFirstExisting() {
-        Ipv4Resource parent = add(node("1-2"));
+        Ipv4Interval parent = add(node("1-2"));
         add(node("3-4"));
-        Ipv4Resource node = add(node("2"));
+        Ipv4Interval node = add(node("2"));
 
         assertThat(allNodes(), hasSize(3));
         assertNotNull(subject.findExact(node));
@@ -147,8 +147,8 @@ public class NestedIntervalMapNonLookupTest {
     @Test
     public void addChildToLastExisting() {
         add(node("1-2"));
-        Ipv4Resource parent = add(node("3-4"));
-        Ipv4Resource node = add(node("4"));
+        Ipv4Interval parent = add(node("3-4"));
+        Ipv4Interval node = add(node("4"));
 
         assertThat(allNodes(), hasSize(3));
         assertNotNull(subject.findExact(node));
@@ -160,9 +160,9 @@ public class NestedIntervalMapNonLookupTest {
     @Test
     public void addChildToMiddleExisting() {
         add(node("1-2"));
-        Ipv4Resource parent = add(node("3-4"));
+        Ipv4Interval parent = add(node("3-4"));
         add(node("5-6"));
-        Ipv4Resource node = add(node("4"));
+        Ipv4Interval node = add(node("4"));
 
         assertThat(allNodes(), hasSize(4));
         assertNotNull(subject.findExact(node));
@@ -173,15 +173,15 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addChildrenClearBounds() {
-        List<Ipv4Resource> parents = Lists.newArrayList();
+        List<Ipv4Interval> parents = Lists.newArrayList();
         parents.add(add(node("1-7")));
         parents.add(add(node("2-6")));
         parents.add(add(node("3-5")));
-        Ipv4Resource node = add(node("4"));
+        Ipv4Interval node = add(node("4"));
 
         assertThat(allNodes(), hasSize(parents.size() + 1));
         assertNotNull(subject.findExact(node));
-        for (Ipv4Resource parent : parents) {
+        for (Ipv4Interval parent : parents) {
             assertNotNull(subject.findExact(parent));
         }
         assertThat(subject.findAllLessSpecific(node), is(parents));
@@ -189,11 +189,11 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addChildrenLeftBounds() {
-        List<Ipv4Resource> parents = Lists.newArrayList();
+        List<Ipv4Interval> parents = Lists.newArrayList();
         parents.add(add(node("1-4")));
         parents.add(add(node("1-3")));
         parents.add(add(node("1-2")));
-        Ipv4Resource node = add(node("1"));
+        Ipv4Interval node = add(node("1"));
 
         assertThat(allNodes(), hasSize(parents.size() + 1));
         assertNotNull(subject.findExact(node));
@@ -203,11 +203,11 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addChildrenRightBounds() {
-        List<Ipv4Resource> parents = Lists.newArrayList();
+        List<Ipv4Interval> parents = Lists.newArrayList();
         parents.add(add(node("1-4")));
         parents.add(add(node("2-4")));
         parents.add(add(node("3-4")));
-        Ipv4Resource node = add(node("4"));
+        Ipv4Interval node = add(node("4"));
 
         assertThat(allNodes(), hasSize(parents.size() + 1));
         assertNotNull(subject.findExact(node));
@@ -218,8 +218,8 @@ public class NestedIntervalMapNonLookupTest {
     /* Create parent */
     @Test
     public void addParentForSingleNode() {
-        Ipv4Resource node = add(node("1"));
-        Ipv4Resource parent = add(node("1-2"));
+        Ipv4Interval node = add(node("1"));
+        Ipv4Interval parent = add(node("1-2"));
 
         assertThat(allNodes(), hasSize(2));
         assertNotNull(subject.findExact(node));
@@ -230,9 +230,9 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addParentForMultipleNode() {
-        Ipv4Resource node1 = add(node(1));
-        Ipv4Resource node2 = add(node(2));
-        Ipv4Resource parent = add(node("1-2"));
+        Ipv4Interval node1 = add(node(1));
+        Ipv4Interval node2 = add(node(2));
+        Ipv4Interval parent = add(node("1-2"));
 
         assertThat(allNodes(), hasSize(3));
         assertNotNull(subject.findExact(node1));
@@ -245,9 +245,9 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addParentInbetweenTwoNodes() {
-        Ipv4Resource parent = add(node("1-4"));
+        Ipv4Interval parent = add(node("1-4"));
         add(node(2));
-        Ipv4Resource node = add(node("2-3"));
+        Ipv4Interval node = add(node("2-3"));
 
         assertThat(allNodes(), hasSize(3));
         assertNotNull(subject.findExact(node));
@@ -258,9 +258,9 @@ public class NestedIntervalMapNonLookupTest {
 
     @Test
     public void addParentStartIntersect() {
-        Ipv4Resource node = add(node(2));
+        Ipv4Interval node = add(node(2));
         add(node(3));
-        Ipv4Resource parent = add(node("1-2"));
+        Ipv4Interval parent = add(node("1-2"));
 
         assertThat(allNodes(), hasSize(3));
         assertNotNull(subject.findExact(parent));
@@ -272,8 +272,8 @@ public class NestedIntervalMapNonLookupTest {
     @Test
     public void addParentEndIntersect() {
         add(node(2));
-        Ipv4Resource node = add(node(3));
-        Ipv4Resource parent = add(node("3-4"));
+        Ipv4Interval node = add(node(3));
+        Ipv4Interval parent = add(node("3-4"));
 
         assertThat(allNodes(), hasSize(3));
         assertNotNull(subject.findExact(parent));
@@ -285,10 +285,10 @@ public class NestedIntervalMapNonLookupTest {
     @Test
     public void addParentMiddleIntersect() {
         add(node(1));
-        Ipv4Resource node1 = add(node(2));
-        Ipv4Resource node2 = add(node(3));
+        Ipv4Interval node1 = add(node(2));
+        Ipv4Interval node2 = add(node(3));
         add(node(4));
-        Ipv4Resource parent = add(node("2-3"));
+        Ipv4Interval parent = add(node("2-3"));
 
         assertThat(allNodes(), hasSize(5));
         assertNotNull(subject.findExact(node1));
@@ -309,12 +309,12 @@ public class NestedIntervalMapNonLookupTest {
 
         assertThat(allNodes(), hasSize(4));
 
-        NestedIntervalMap<Ipv4Resource, Ipv4Resource> original = subject;
+        NestedIntervalMap<Ipv4Interval, Ipv4Interval> original = subject;
         subject = new NestedIntervalMap<>(original);
 
         assertThat(allNodes(), hasSize(4));
         assertThat(original, is(subject));
-        for (Ipv4Resource node : allNodes()) {
+        for (Ipv4Interval node : allNodes()) {
             assertNotNull(subject.findExact(node));
         }
 

@@ -1,6 +1,6 @@
 package com.bol.ipresource.etree;
 
-import com.bol.ipresource.ip.Ipv4Resource;
+import com.bol.ipresource.ip.Ipv4Interval;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,25 +19,25 @@ import static org.junit.Assert.fail;
 
 public class NestedIntervalMapTest {
 
-    private NestedIntervalMap<Ipv4Resource, Ipv4Resource> subject = new NestedIntervalMap<>();
-    private Ipv4Resource N1_12 = new Ipv4Resource(1, 12);
-    private Ipv4Resource N1_4 = new Ipv4Resource(1, 4);
-    private Ipv4Resource N5_10 = new Ipv4Resource(5, 10);
-    private Ipv4Resource N1_1 = new Ipv4Resource(1, 1);
-    private Ipv4Resource N2_2 = new Ipv4Resource(2, 2);
-    private Ipv4Resource N3_3 = new Ipv4Resource(3, 3);
-    private Ipv4Resource N4_4 = new Ipv4Resource(4, 4);
-    private Ipv4Resource N5_5 = new Ipv4Resource(5, 5);
-    private Ipv4Resource N6_6 = new Ipv4Resource(6, 6);
-    private Ipv4Resource N7_7 = new Ipv4Resource(7, 7);
-    private Ipv4Resource N8_8 = new Ipv4Resource(8, 8);
-    private Ipv4Resource N9_9 = new Ipv4Resource(9, 9);
-    private Ipv4Resource N10_10 = new Ipv4Resource(10, 10);
-    private Ipv4Resource N3_4 = new Ipv4Resource(3, 4);
-    private Ipv4Resource N5_8 = new Ipv4Resource(5, 8);
-    private Ipv4Resource N9_10 = new Ipv4Resource(9, 10);
-    private Ipv4Resource N11_12 = new Ipv4Resource(11, 12);
-    private List<Ipv4Resource> all = new ArrayList<>();
+    private NestedIntervalMap<Ipv4Interval, Ipv4Interval> subject = new NestedIntervalMap<>();
+    private Ipv4Interval N1_12 = new Ipv4Interval(1, 12);
+    private Ipv4Interval N1_4 = new Ipv4Interval(1, 4);
+    private Ipv4Interval N5_10 = new Ipv4Interval(5, 10);
+    private Ipv4Interval N1_1 = new Ipv4Interval(1, 1);
+    private Ipv4Interval N2_2 = new Ipv4Interval(2, 2);
+    private Ipv4Interval N3_3 = new Ipv4Interval(3, 3);
+    private Ipv4Interval N4_4 = new Ipv4Interval(4, 4);
+    private Ipv4Interval N5_5 = new Ipv4Interval(5, 5);
+    private Ipv4Interval N6_6 = new Ipv4Interval(6, 6);
+    private Ipv4Interval N7_7 = new Ipv4Interval(7, 7);
+    private Ipv4Interval N8_8 = new Ipv4Interval(8, 8);
+    private Ipv4Interval N9_9 = new Ipv4Interval(9, 9);
+    private Ipv4Interval N10_10 = new Ipv4Interval(10, 10);
+    private Ipv4Interval N3_4 = new Ipv4Interval(3, 4);
+    private Ipv4Interval N5_8 = new Ipv4Interval(5, 8);
+    private Ipv4Interval N9_10 = new Ipv4Interval(9, 10);
+    private Ipv4Interval N11_12 = new Ipv4Interval(11, 12);
+    private List<Ipv4Interval> all = new ArrayList<>();
 
     @Before
     public void setup() {
@@ -60,7 +60,7 @@ public class NestedIntervalMapTest {
         all.add(N11_12);
         Collections.sort(all);
 
-        for (Ipv4Resource n : all) {
+        for (Ipv4Interval n : all) {
             subject.put(n, n);
         }
     }
@@ -82,10 +82,10 @@ public class NestedIntervalMapTest {
     @Test
     public void fail_on_intersecting_siblings() {
         try {
-            subject.put(new Ipv4Resource(8, 13), N1_1);
+            subject.put(new Ipv4Interval(8, 13), N1_1);
             fail("Exception expected");
         } catch (IntersectingIntervalException expected) {
-            assertEquals(new Ipv4Resource(8, 13), expected.getInterval());
+            assertEquals(new Ipv4Interval(8, 13), expected.getInterval());
             assertEquals(asList(N1_12), expected.getIntersections());
         }
     }
@@ -115,24 +115,24 @@ public class NestedIntervalMapTest {
 
     @Test
     public void test_remove_key_value_nonexistant() {
-        NestedIntervalMap<Ipv4Resource, Ipv4Resource> copy = new NestedIntervalMap<>(subject);
+        NestedIntervalMap<Ipv4Interval, Ipv4Interval> copy = new NestedIntervalMap<>(subject);
 
-        final Ipv4Resource resource = new Ipv4Resource(0, 100);
+        final Ipv4Interval resource = new Ipv4Interval(0, 100);
         subject.remove(resource, resource);
         assertEquals(copy, subject);
     }
 
     @Test
     public void test_remove_nonexistant() {
-        NestedIntervalMap<Ipv4Resource, Ipv4Resource> copy = new NestedIntervalMap<>(subject);
+        NestedIntervalMap<Ipv4Interval, Ipv4Interval> copy = new NestedIntervalMap<>(subject);
 
-        subject.remove(new Ipv4Resource(0, 100));
+        subject.remove(new Ipv4Interval(0, 100));
         assertEquals(copy, subject);
 
-        subject.remove(new Ipv4Resource(1, 7));
+        subject.remove(new Ipv4Interval(1, 7));
         assertEquals(copy, subject);
 
-        subject.remove(new Ipv4Resource(12, 12));
+        subject.remove(new Ipv4Interval(12, 12));
         assertEquals(copy, subject);
     }
 
@@ -141,16 +141,16 @@ public class NestedIntervalMapTest {
         assertFalse(subject.equals(null));
         assertEquals(subject, subject);
         assertFalse(subject.equals(new Object()));
-        assertFalse(subject.equals(new NestedIntervalMap<Ipv4Resource, Ipv4Resource>()));
+        assertFalse(subject.equals(new NestedIntervalMap<Ipv4Interval, Ipv4Interval>()));
 
         assertEquals(subject.hashCode(), subject.hashCode());
-        assertFalse(subject.hashCode() == new NestedIntervalMap<Ipv4Resource, Ipv4Resource>().hashCode());
+        assertFalse(subject.hashCode() == new NestedIntervalMap<Ipv4Interval, Ipv4Interval>().hashCode());
     }
 
     @Test
     public void test_find_all_less_specific() {
-        assertEquals(Collections.emptyList(), subject.findAllLessSpecific(new Ipv4Resource(0, 100)));
-        assertEquals(Collections.emptyList(), subject.findAllLessSpecific(new Ipv4Resource(5, 13)));
+        assertEquals(Collections.emptyList(), subject.findAllLessSpecific(new Ipv4Interval(0, 100)));
+        assertEquals(Collections.emptyList(), subject.findAllLessSpecific(new Ipv4Interval(5, 13)));
         assertEquals(Collections.emptyList(), subject.findAllLessSpecific(N1_12));
         assertEquals(asList(N1_12, N5_10, N5_8), subject.findAllLessSpecific(N6_6));
         assertEquals(asList(N1_12, N5_10, N5_8), subject.findAllLessSpecific(N8_8));
@@ -159,8 +159,8 @@ public class NestedIntervalMapTest {
 
     @Test
     public void test_find_exact_and_all_less_specific() {
-        assertEquals(Collections.emptyList(), subject.findExactAndAllLessSpecific(new Ipv4Resource(0, 100)));
-        assertEquals(Collections.emptyList(), subject.findExactAndAllLessSpecific(new Ipv4Resource(5, 13)));
+        assertEquals(Collections.emptyList(), subject.findExactAndAllLessSpecific(new Ipv4Interval(0, 100)));
+        assertEquals(Collections.emptyList(), subject.findExactAndAllLessSpecific(new Ipv4Interval(5, 13)));
         assertEquals(asList(N1_12), subject.findExactAndAllLessSpecific(N1_12));
         assertEquals(asList(N1_12, N5_10, N5_8, N6_6), subject.findExactAndAllLessSpecific(N6_6));
         assertEquals(asList(N1_12, N5_10, N5_8), subject.findExactAndAllLessSpecific(N8_8));
@@ -169,8 +169,8 @@ public class NestedIntervalMapTest {
 
     @Test
     public void test_find_exact_or_first_less_specific() {
-        assertThat(subject.findExactOrFirstLessSpecific(new Ipv4Resource(0, 100)), hasSize(0));
-        assertThat(subject.findExactOrFirstLessSpecific(new Ipv4Resource(5, 13)), hasSize(0));
+        assertThat(subject.findExactOrFirstLessSpecific(new Ipv4Interval(0, 100)), hasSize(0));
+        assertThat(subject.findExactOrFirstLessSpecific(new Ipv4Interval(5, 13)), hasSize(0));
 
         assertThat(subject.findExactOrFirstLessSpecific(N1_12), contains(N1_12));
         assertThat(subject.findExactOrFirstLessSpecific(N6_6), contains(N6_6));
@@ -185,26 +185,26 @@ public class NestedIntervalMapTest {
         assertThat(subject.findFirstLessSpecific(N6_6), contains(N5_8));
         assertThat(subject.findFirstLessSpecific(N8_8), contains(N5_8));
         assertThat(subject.findFirstLessSpecific(N2_2), contains(N1_4));
-        assertThat(subject.findFirstLessSpecific(new Ipv4Resource(3, 7)), contains(N1_12));
+        assertThat(subject.findFirstLessSpecific(new Ipv4Interval(3, 7)), contains(N1_12));
     }
 
     @Test
     public void testFindEverything() {
-        assertEquals(all, subject.findExactAndAllMoreSpecific(Ipv4Resource.MAX_RANGE));
-        subject.put(Ipv4Resource.MAX_RANGE, Ipv4Resource.MAX_RANGE);
+        assertEquals(all, subject.findExactAndAllMoreSpecific(Ipv4Interval.MAX_RANGE));
+        subject.put(Ipv4Interval.MAX_RANGE, Ipv4Interval.MAX_RANGE);
     }
 
     @Test
     public void testFindFirstMoreSpecific() {
         assertEquals(asList(N5_8, N9_10), subject.findFirstMoreSpecific(N5_10));
         assertEquals(asList(N1_1, N2_2, N3_4), subject.findFirstMoreSpecific(N1_4));
-        assertEquals(asList(N7_7, N9_9), subject.findFirstMoreSpecific(new Ipv4Resource(7, 9)));
-        assertEquals(asList(N9_9), subject.findFirstMoreSpecific(new Ipv4Resource(8, 9)));
+        assertEquals(asList(N7_7, N9_9), subject.findFirstMoreSpecific(new Ipv4Interval(7, 9)));
+        assertEquals(asList(N9_9), subject.findFirstMoreSpecific(new Ipv4Interval(8, 9)));
     }
 
     @Test
     public void testFindExact() {
-        for (Ipv4Resource n : all) {
+        for (Ipv4Interval n : all) {
             assertThat(subject.findExact(n), contains(n));
         }
     }
@@ -212,8 +212,8 @@ public class NestedIntervalMapTest {
     @Test
     public void testFindAllMoreSpecific() {
         assertEquals(all.subList(1, all.size()), subject.findAllMoreSpecific(N1_12));
-        assertEquals(asList(N3_4, N3_3, N4_4, N5_5, N6_6, N7_7), subject.findAllMoreSpecific(new Ipv4Resource(3, 7)));
-        assertEquals(asList(N9_9), subject.findAllMoreSpecific(new Ipv4Resource(8, 9)));
+        assertEquals(asList(N3_4, N3_3, N4_4, N5_5, N6_6, N7_7), subject.findAllMoreSpecific(new Ipv4Interval(3, 7)));
+        assertEquals(asList(N9_9), subject.findAllMoreSpecific(new Ipv4Interval(8, 9)));
     }
 
     @Test
@@ -224,12 +224,12 @@ public class NestedIntervalMapTest {
 
     @Test
     public void detect_intersect_on_lower_bound_of_new_interval() {
-        Ipv4Resource child1 = new Ipv4Resource(1, 10);
-        Ipv4Resource child2 = new Ipv4Resource(11, 15);
-        Ipv4Resource child3 = new Ipv4Resource(16, 25);
-        Ipv4Resource intersect = new Ipv4Resource(8, 30);
+        Ipv4Interval child1 = new Ipv4Interval(1, 10);
+        Ipv4Interval child2 = new Ipv4Interval(11, 15);
+        Ipv4Interval child3 = new Ipv4Interval(16, 25);
+        Ipv4Interval intersect = new Ipv4Interval(8, 30);
 
-        NestedIntervalMap<Ipv4Resource, Ipv4Resource> test = new NestedIntervalMap<>();
+        NestedIntervalMap<Ipv4Interval, Ipv4Interval> test = new NestedIntervalMap<>();
         test.put(child1, child1);
         test.put(child2, child2);
         test.put(child3, child3);
@@ -246,12 +246,12 @@ public class NestedIntervalMapTest {
 
     @Test
     public void detect_intersect_on_upper_bound_of_new_interval() {
-        Ipv4Resource child1 = new Ipv4Resource(1, 10);
-        Ipv4Resource child2 = new Ipv4Resource(11, 15);
-        Ipv4Resource child3 = new Ipv4Resource(16, 25);
-        Ipv4Resource intersect = new Ipv4Resource(1, 21);
+        Ipv4Interval child1 = new Ipv4Interval(1, 10);
+        Ipv4Interval child2 = new Ipv4Interval(11, 15);
+        Ipv4Interval child3 = new Ipv4Interval(16, 25);
+        Ipv4Interval intersect = new Ipv4Interval(1, 21);
 
-        NestedIntervalMap<Ipv4Resource, Ipv4Resource> test = new NestedIntervalMap<>();
+        NestedIntervalMap<Ipv4Interval, Ipv4Interval> test = new NestedIntervalMap<>();
         test.put(child1, child1);
         test.put(child2, child2);
         test.put(child3, child3);
@@ -268,12 +268,12 @@ public class NestedIntervalMapTest {
 
     @Test
     public void detect_intersect_on_lower_and_upper_bound_of_new_interval() {
-        Ipv4Resource child1 = new Ipv4Resource(1, 10);
-        Ipv4Resource child2 = new Ipv4Resource(11, 15);
-        Ipv4Resource child3 = new Ipv4Resource(16, 25);
-        Ipv4Resource intersect = new Ipv4Resource(4, 21);
+        Ipv4Interval child1 = new Ipv4Interval(1, 10);
+        Ipv4Interval child2 = new Ipv4Interval(11, 15);
+        Ipv4Interval child3 = new Ipv4Interval(16, 25);
+        Ipv4Interval intersect = new Ipv4Interval(4, 21);
 
-        NestedIntervalMap<Ipv4Resource, Ipv4Resource> test = new NestedIntervalMap<>();
+        NestedIntervalMap<Ipv4Interval, Ipv4Interval> test = new NestedIntervalMap<>();
         test.put(child1, child1);
         test.put(child2, child2);
         test.put(child3, child3);

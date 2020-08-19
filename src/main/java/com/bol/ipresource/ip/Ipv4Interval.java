@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  * are stored as signed 32-bit <code>int</code>s. Externally they are
  * represented as <code>long</code>s to avoid issues with the sign-bit.
  */
-public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comparable<Ipv4Resource> {
+public final class Ipv4Interval extends IpInterval<Ipv4Interval> implements Comparable<Ipv4Interval> {
     public static final String IPV4_REVERSE_DOMAIN = ".in-addr.arpa";
 
     private static final Splitter IPV4_TEXT_SPLITTER = Splitter.on('.');
@@ -30,7 +30,7 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
      * The IPv4 interval that includes all IPv4 addresses (0.0.0.0/0 in CIDR
      * notation).
      */
-    public static final Ipv4Resource MAX_RANGE = new Ipv4Resource(MINIMUM_NUMBER, MAXIMUM_NUMBER);
+    public static final Ipv4Interval MAX_RANGE = new Ipv4Interval(MINIMUM_NUMBER, MAXIMUM_NUMBER);
 
     private static final Splitter SPLIT_ON_DOT = Splitter.on('.');
     private static final Pattern OCTET_PATTERN = Pattern.compile("^(?:[0-9]|[1-9][0-9]+)(?:-(?:[0-9]|[1-9][0-9]+)+)?$");
@@ -38,7 +38,7 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
     private final int begin;
     private final int end;
 
-    private Ipv4Resource(int begin, int end) {
+    private Ipv4Interval(int begin, int end) {
         this.begin = begin;
         this.end = end;
     }
@@ -52,7 +52,7 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
      * @throws IllegalArgumentException if the start or end addresses are invalid or if the start
      *                                  address is greater than the end address.
      */
-    public Ipv4Resource(long begin, long end) {
+    public Ipv4Interval(long begin, long end) {
         if (begin > end) {
             throw new IllegalArgumentException("Begin: " + begin + " not before End: " + end);
         }
@@ -67,7 +67,7 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
         this.end = (int) end;
     }
 
-    public static Ipv4Resource parse(InetAddress inetAddress) {
+    public static Ipv4Interval parse(InetAddress inetAddress) {
         if (!(inetAddress instanceof Inet4Address)) {
             throw new IllegalArgumentException("Not an IPv4 address: " + inetAddress);
         }
@@ -76,10 +76,10 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
         address |= ((addressArray[2] << 8) & 0xFF00);
         address |= ((addressArray[1] << 16) & 0xFF0000);
         address |= ((addressArray[0] << 24) & 0xFF000000);
-        return new Ipv4Resource(address, address);
+        return new Ipv4Interval(address, address);
     }
 
-    public static Ipv4Resource parse(String resource) {
+    public static Ipv4Interval parse(String resource) {
         int indexOfSlash = resource.indexOf('/');
         if (indexOfSlash >= 0) {
             int begin = textToNumericFormat(resource.substring(0, indexOfSlash).trim());
@@ -93,30 +93,30 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
             int mask = (int) ((1L << (32 - prefixLength)) - 1);
             int end = begin | mask;
             begin = begin & ~mask;
-            return new Ipv4Resource(begin, end);
+            return new Ipv4Interval(begin, end);
         }
 
         int indexOfDash = resource.indexOf('-');
         if (indexOfDash >= 0) {
             long begin = ((long) textToNumericFormat(resource.substring(0, indexOfDash).trim())) & 0xffffffffL;
             long end = ((long) textToNumericFormat(resource.substring(indexOfDash + 1).trim())) & 0xffffffffL;
-            return new Ipv4Resource(begin, end);
+            return new Ipv4Interval(begin, end);
         }
 
         return parseIpAddress(resource);
     }
 
-    public static Ipv4Resource parseIpAddress(String ipAddress) {
+    public static Ipv4Interval parseIpAddress(String ipAddress) {
         int begin = textToNumericFormat(ipAddress.trim());
-        return new Ipv4Resource(begin, begin);
+        return new Ipv4Interval(begin, begin);
     }
 
-    public static Ipv4Resource parsePrefixWithLength(long prefix, int prefixLength) {
+    public static Ipv4Interval parsePrefixWithLength(long prefix, int prefixLength) {
         long mask = (1L << (32 - prefixLength)) - 1;
-        return new Ipv4Resource((prefix & ~mask) & 0xFFFFFFFFL, (prefix | mask) & 0xFFFFFFFFL);
+        return new Ipv4Interval((prefix & ~mask) & 0xFFFFFFFFL, (prefix | mask) & 0xFFFFFFFFL);
     }
 
-    public static Ipv4Resource parseReverseDomain(String address) {
+    public static Ipv4Interval parseReverseDomain(String address) {
         Validate.notEmpty(address);
         String cleanAddress = removeTrailingDot(address.trim());
 
@@ -178,18 +178,18 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
     }
 
     @Override
-    public boolean contains(Ipv4Resource that) {
+    public boolean contains(Ipv4Interval that) {
         return begin() <= that.begin() && end() >= that.end();
     }
 
     @Override
-    public boolean intersects(Ipv4Resource that) {
+    public boolean intersects(Ipv4Interval that) {
         return (isIPWithinRange(begin(), that)
                 || isIPWithinRange(end(), that)
                 || isIPWithinRange(that.begin(), this));
     }
 
-    private boolean isIPWithinRange(long ip, Ipv4Resource range) {
+    private boolean isIPWithinRange(long ip, Ipv4Interval range) {
         return ip >= range.begin() && ip <= range.end();
     }
 
@@ -213,7 +213,7 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
         if (getClass() != obj.getClass()) {
             return false;
         }
-        Ipv4Resource that = (Ipv4Resource) obj;
+        Ipv4Interval that = (Ipv4Interval) obj;
         return begin == that.begin && end == that.end;
     }
 
@@ -275,7 +275,7 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
      * less-specific ranges before more-specific ranges.
      */
     @Override
-    public int compareTo(Ipv4Resource that) {
+    public int compareTo(Ipv4Interval that) {
         if (begin() < that.begin()) {
             return -1;
         } else if (begin() > that.begin()) {
@@ -290,12 +290,12 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
     }
 
     @Override
-    public Ipv4Resource singletonIntervalAtLowerBound() {
-        return new Ipv4Resource(begin(), begin());
+    public Ipv4Interval singletonIntervalAtLowerBound() {
+        return new Ipv4Interval(begin(), begin());
     }
 
     @Override
-    public int compareUpperBound(Ipv4Resource that) {
+    public int compareUpperBound(Ipv4Interval that) {
         long thisEnd = end();
         long thatEnd = that.end();
         return thisEnd < thatEnd ? -1 : thisEnd > thatEnd ? 1 : 0;
@@ -307,8 +307,18 @@ public final class Ipv4Resource extends IpInterval<Ipv4Resource> implements Comp
     }
 
     @Override
+    public InetAddress endAsInetAddress() {
+        return InetAddresses.fromInteger(end);
+    }
+
+    @Override
     public byte[] beginAsByteArray() {
         return Ints.toByteArray(begin);
+    }
+
+    @Override
+    public byte[] endAsByteArray() {
+        return Ints.toByteArray(end);
     }
 
     @Override

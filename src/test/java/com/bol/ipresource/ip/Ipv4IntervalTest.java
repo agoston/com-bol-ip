@@ -377,4 +377,14 @@ public class Ipv4IntervalTest {
         assertThat(Ipv4Interval.parsePrefixWithLength(0xDEADBEEF, 13).toString(), is("222.168.0.0/13"));
         assertThat(Ipv4Interval.parsePrefixWithLength(0xCAFEBABE, 26).toString(), is("202.254.186.128/26"));
     }
+
+    @Test
+    public void toByteArray() {
+        assertThat(Ipv4Interval.parse(Ipv4Interval.parse("1.2.3/24").beginAsInetAddress()), is(Ipv4Interval.parse("1.2.3.0/32")));
+        assertThat(Ipv4Interval.parse(Ipv4Interval.parse("1.2.3/24").endAsInetAddress()), is(Ipv4Interval.parse("1.2.3.255/32")));
+
+        assertThat(Ipv4Interval.parse(Ipv4Interval.parse("11/9").beginAsInetAddress()), is(Ipv4Interval.parse("11.0.0.0/32")));
+        assertThat(Ipv4Interval.parse(Ipv4Interval.parse("11/9").endAsInetAddress()), is(Ipv4Interval.parse("11.127.255.255/32")));
+    }
+
 }

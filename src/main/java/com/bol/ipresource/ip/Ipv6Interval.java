@@ -184,9 +184,15 @@ public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comp
     private static byte[] toByteArray(long msb, long lsb) {
         byte[] data = new byte[16];
 
-        for (int i = 0; i < 16; i++) {
-            data[i] = (byte) ((i < 8 ? msb : lsb) >>> (8 * (7 - (i % 8))) & 0xFF);
+        for (int i = 7; i >= 0; i--) {
+            data[i] = (byte) (msb & 0xffL);
+            msb >>= 8;
         }
+        for (int i = 15; i >= 8; i--) {
+            data[i] = (byte) (lsb & 0xffL);
+            lsb >>= 8;
+        }
+
         return data;
     }
 
@@ -243,11 +249,8 @@ public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comp
 
     @Override
     public InetAddress beginAsInetAddress() {
-        byte[] bytes = new byte[16];
-        System.arraycopy(Longs.toByteArray(beginMsb), 0, bytes, 8, 8);
-        System.arraycopy(Longs.toByteArray(beginLsb), 0, bytes, 0, 8);
         try {
-            return Inet6Address.getByAddress(bytes);
+            return Inet6Address.getByAddress(toByteArray(beginMsb, beginLsb));
         } catch (UnknownHostException e) {
             // this will never happen
             return null;
@@ -256,11 +259,8 @@ public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comp
 
     @Override
     public InetAddress endAsInetAddress() {
-        byte[] bytes = new byte[16];
-        System.arraycopy(Longs.toByteArray(endMsb), 0, bytes, 8, 8);
-        System.arraycopy(Longs.toByteArray(endLsb), 0, bytes, 0, 8);
         try {
-            return Inet6Address.getByAddress(bytes);
+            return Inet6Address.getByAddress(toByteArray(endMsb, endLsb));
         } catch (UnknownHostException e) {
             // this will never happen
             return null;

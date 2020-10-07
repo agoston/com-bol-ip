@@ -420,4 +420,13 @@ public class Ipv6IntervalTest {
     public void invalid_prefix_length() {
         Ipv6Interval.parse("2001::/129");
     }
+
+    @Test
+    public void toByteArray() {
+        assertThat(Ipv6Interval.parse(Ipv6Interval.parse("2001::/112").beginAsInetAddress()), is(Ipv6Interval.parse("2001::/128")));
+        assertThat(Ipv6Interval.parse(Ipv6Interval.parse("2001::/112").endAsInetAddress()), is(Ipv6Interval.parse("2001::ffff/128")));
+
+        assertThat(Ipv6Interval.parse(Ipv6Interval.parse("2001::/16").beginAsInetAddress()), is(Ipv6Interval.parse("2001::/128")));
+        assertThat(Ipv6Interval.parse(Ipv6Interval.parse("2001::/16").endAsInetAddress()), is(Ipv6Interval.parse("2001:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128")));
+    }
 }

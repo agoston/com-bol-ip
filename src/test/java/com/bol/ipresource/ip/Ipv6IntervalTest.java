@@ -389,7 +389,7 @@ public class Ipv6IntervalTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_no_octets() {
-        Ipv6Interval.parseReverseDomain(".ip6.arpa");
+        Ipv6Interval.parseReverseDomain(".ip6.arpa.");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -399,21 +399,39 @@ public class Ipv6IntervalTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_invalid_nibbles_dash() {
-        Ipv6Interval.parseReverseDomain("1-1.1.a.ip6.arpa");
+        Ipv6Interval.parseReverseDomain("1-1.1.a.ip6.arpa.");
     }
     @Test(expected = IllegalArgumentException.class)
     public void reverse_invalid_nibbles_non_hex() {
-        Ipv6Interval.parseReverseDomain("g.ip6.arpa");
+        Ipv6Interval.parseReverseDomain("g.ip6.arpa.");
     }
 
     @Test
     public void reverse_simple() {
-        assertThat(Ipv6Interval.parseReverseDomain("2.ip6.arpa").toString(), is("2000::/4"));
-        assertThat(Ipv6Interval.parseReverseDomain("8.3.7.0.1.0.0.2.ip6.arpa").toString(), is("2001:738::/32"));
-        assertThat(Ipv6Interval.parseReverseDomain("a.7.9.b.1.1.0.2.8.b.7.0.1.0.a.2.ip6.arpa").toString(), is("2a01:7b8:2011:b97a::/64"));
-        assertThat(Ipv6Interval.parseReverseDomain("b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa").toString(), is("2001:db8::567:89ab/128"));
-        assertThat(Ipv6Interval.parseReverseDomain("B.A.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.B.D.0.1.0.0.2.ip6.arpa").toString(), is("2001:db8::567:89ab/128"));
-        assertThat(Ipv6Interval.parseReverseDomain("a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa").toString(), is("2001:db8::567:89a0/124"));
+        assertThat(Ipv6Interval.parseReverseDomain("2.ip6.arpa.").toString(), is("2000::/4"));
+        assertThat(Ipv6Interval.parseReverseDomain("8.3.7.0.1.0.0.2.ip6.arpa.").toString(), is("2001:738::/32"));
+        assertThat(Ipv6Interval.parseReverseDomain("a.7.9.b.1.1.0.2.8.b.7.0.1.0.a.2.ip6.arpa.").toString(), is("2a01:7b8:2011:b97a::/64"));
+        assertThat(Ipv6Interval.parseReverseDomain("b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.").toString(), is("2001:db8::567:89ab/128"));
+        assertThat(Ipv6Interval.parseReverseDomain("B.A.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.B.D.0.1.0.0.2.ip6.arpa.").toString(), is("2001:db8::567:89ab/128"));
+        assertThat(Ipv6Interval.parseReverseDomain("a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.").toString(), is("2001:db8::567:89a0/124"));
+    }
+
+    @Test
+    public void reverse_tostring() {
+        assertThat(IpInterval.parseReverseDomain("2.ip6.arpa.").toReverseDomain(), is("2.ip6.arpa."));
+        assertThat(IpInterval.parseReverseDomain("8.3.7.0.1.0.0.2.ip6.arpa.").toReverseDomain(), is("8.3.7.0.1.0.0.2.ip6.arpa."));
+        assertThat(IpInterval.parseReverseDomain("a.7.9.b.1.1.0.2.8.b.7.0.1.0.a.2.ip6.arpa.").toReverseDomain(), is("a.7.9.b.1.1.0.2.8.b.7.0.1.0.a.2.ip6.arpa."));
+        assertThat(IpInterval.parseReverseDomain("b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.").toReverseDomain(), is("b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa."));
+        assertThat(IpInterval.parseReverseDomain("a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.").toReverseDomain(), is("a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa."));
+    }
+
+    @Test
+    public void range_tostring() {
+        assertThat(IpInterval.parseReverseDomain("2.ip6.arpa.").toRangeString(), is("2000:: - 2fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"));
+        assertThat(IpInterval.parseReverseDomain("8.3.7.0.1.0.0.2.ip6.arpa.").toRangeString(), is("2001:738:: - 2001:738:ffff:ffff:ffff:ffff:ffff:ffff"));
+        assertThat(IpInterval.parseReverseDomain("a.7.9.b.1.1.0.2.8.b.7.0.1.0.a.2.ip6.arpa.").toRangeString(), is("2a01:7b8:2011:b97a:: - 2a01:7b8:2011:b97a:ffff:ffff:ffff:ffff"));
+        assertThat(IpInterval.parseReverseDomain("b.a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.").toRangeString(), is("2001:db8::567:89ab - 2001:db8::567:89ab"));
+        assertThat(IpInterval.parseReverseDomain("a.9.8.7.6.5.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.8.b.d.0.1.0.0.2.ip6.arpa.").toRangeString(), is("2001:db8::567:89a0 - 2001:db8::567:89af"));
     }
 
     @Test(expected = IllegalArgumentException.class)

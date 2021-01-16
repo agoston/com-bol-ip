@@ -1,17 +1,11 @@
 package com.bol.ipresource.ip;
 
+import com.bol.ipresource.util.Validate;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 
 public abstract class IpInterval<K extends Interval<K>> implements Interval<K> {
-    public static String removeTrailingDot(String address) {
-        if (address.endsWith(".")) {
-            return address.substring(0, address.length() - 1);
-        }
-
-        return address;
-    }
-
     public static IpInterval<?> parse(String addressPrefixOrRange) {
         if (addressPrefixOrRange.indexOf(':') == -1) {
             return Ipv4Interval.parse(addressPrefixOrRange);
@@ -20,14 +14,25 @@ public abstract class IpInterval<K extends Interval<K>> implements Interval<K> {
         return Ipv6Interval.parse(addressPrefixOrRange);
     }
 
-    public static IpInterval<?> parseReverseDomain(String reverse) {
-        String result = removeTrailingDot(reverse).toLowerCase();
-
-        if (result.endsWith(Ipv4Interval.IPV4_REVERSE_DOMAIN)) {
-            return Ipv4Interval.parseReverseDomain(result);
+    public static IpInterval<?> parseAddress(String address) {
+        if (address.indexOf(':') == -1) {
+            return Ipv4Interval.parseAddress(address);
         }
 
-        return Ipv6Interval.parseReverseDomain(result);
+        return Ipv6Interval.parseAddress(address);
+    }
+
+    public static IpInterval<?> parseReverseDomain(String reverse) {
+        Validate.notEmpty(reverse);
+        String cleanAddress = reverse.trim().toLowerCase();
+
+        int reverseDomainIndex = Ipv4Interval.reverseDomainIndex(cleanAddress);
+        if (reverseDomainIndex >= 0) return Ipv4Interval.parseReverseDomain(cleanAddress, reverseDomainIndex);
+
+        reverseDomainIndex = Ipv6Interval.reverseDomainIndex(cleanAddress);
+        if (reverseDomainIndex >= 0) return Ipv6Interval.parseReverseDomain(cleanAddress, reverseDomainIndex);
+
+        throw new IllegalArgumentException("Invalid reverse domain: " + cleanAddress);
     }
 
     public static IpInterval<?> asIpInterval(InetAddress address) {
@@ -38,15 +43,23 @@ public abstract class IpInterval<K extends Interval<K>> implements Interval<K> {
         return Ipv6Interval.parse(address);
     }
 
+    /**
+     * returns a fully qualifies reverse domain, with trailing dot, e.g. 66.152.in-addr.arpa.
+     */
+    public abstract String toReverseDomain();
+
     public abstract String toRangeString();
 
     public abstract String beginAddressAsString();
+
     public abstract String endAddressAsString();
 
     public abstract InetAddress beginAsInetAddress();
+
     public abstract InetAddress endAsInetAddress();
 
     public abstract byte[] beginAsByteArray();
+
     public abstract byte[] endAsByteArray();
 
     public abstract int getPrefixLength();

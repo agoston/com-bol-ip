@@ -317,35 +317,35 @@ public class Ipv4IntervalTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_no_octets() {
-        Ipv4Interval.parseReverseDomain(".in-addr.arpa");
+        Ipv4Interval.parseReverseDomain(".in-addr.arpa.");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_more_than_four_octets() {
-        Ipv4Interval.parseReverseDomain("8.7.6.5.4.3.2.1.in-addr.arpa");
+        Ipv4Interval.parseReverseDomain("8.7.6.5.4.3.2.1.in-addr.arpa.");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_dash_not_in_fourth_octet() {
-        Ipv4Interval.parseReverseDomain("1-1.1.1.in-addr.arpa");
+        Ipv4Interval.parseReverseDomain("1-1.1.1.in-addr.arpa.");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_non_numeric_input() {
-        Ipv4Interval.parseReverseDomain("1-1.b.a.in-addr.arpa");
+        Ipv4Interval.parseReverseDomain("1-1.b.a.in-addr.arpa.");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_multiple_dashes() {
-        Ipv4Interval.parseReverseDomain("1-1.2-2.3-3.4-4.in-addr.arpa");
+        Ipv4Interval.parseReverseDomain("1-1.2-2.3-3.4-4.in-addr.arpa.");
     }
 
     @Test
     public void reverse_simple() {
-        assertThat(Ipv4Interval.parseReverseDomain("111.in-addr.arpa").toString(), is("111.0.0.0/8"));
-        assertThat(Ipv4Interval.parseReverseDomain("22.111.in-addr.arpa").toString(), is("111.22.0.0/16"));
-        assertThat(Ipv4Interval.parseReverseDomain("3.22.111.in-addr.arpa").toString(), is("111.22.3.0/24"));
-        assertThat(Ipv4Interval.parseReverseDomain("4.3.22.111.in-addr.arpa").toString(), is("111.22.3.4/32"));
+        assertThat(Ipv4Interval.parseReverseDomain("111.in-addr.arpa.").toString(), is("111.0.0.0/8"));
+        assertThat(Ipv4Interval.parseReverseDomain("22.111.in-addr.arpa.").toString(), is("111.22.0.0/16"));
+        assertThat(Ipv4Interval.parseReverseDomain("3.22.111.in-addr.arpa.").toString(), is("111.22.3.0/24"));
+        assertThat(Ipv4Interval.parseReverseDomain("4.3.22.111.in-addr.arpa.").toString(), is("111.22.3.4/32"));
     }
 
     @Test
@@ -363,7 +363,50 @@ public class Ipv4IntervalTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void reverse_inverse_range() {
-        Ipv4Interval.parseReverseDomain("80-28.79.198.195.in-addr.arpa");
+        Ipv4Interval.parseReverseDomain("80-28.79.198.195.in-addr.arpa.");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void reverse_tostring_non_prefix() {
+        IpInterval.parse("11.22.33.44 - 11.22.33.55").toReverseDomain();
+    }
+
+    @Test
+    public void reverse_tostring() {
+        assertThat(IpInterval.parse("11.22.33.44").toReverseDomain(), is("44.33.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/24").toReverseDomain(), is("33.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/23").toReverseDomain(), is("32-33.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/22").toReverseDomain(), is("32-35.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/21").toReverseDomain(), is("32-39.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/20").toReverseDomain(), is("32-47.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/19").toReverseDomain(), is("32-63.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/18").toReverseDomain(), is("0-63.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/17").toReverseDomain(), is("0-127.22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/16").toReverseDomain(), is("22.11.in-addr.arpa."));
+        assertThat(IpInterval.parse("11.22.33/15").toReverseDomain(), is("22-23.11.in-addr.arpa."));
+
+        assertThat(IpInterval.parse("0/0").toReverseDomain(), is(".in-addr.arpa."));
+
+        assertThat(IpInterval.parse("212.219.1.0 - 212.219.1.255").toReverseDomain(), is("1.219.212.in-addr.arpa."));
+    }
+
+    @Test
+    public void range_tostring() {
+        assertThat(IpInterval.parse("11.22.33.44").toRangeString(), is("11.22.33.44 - 11.22.33.44"));
+        assertThat(IpInterval.parse("11.22.33/24").toRangeString(), is("11.22.33.0 - 11.22.33.255"));
+        assertThat(IpInterval.parse("11.22.33/23").toRangeString(), is("11.22.32.0 - 11.22.33.255"));
+        assertThat(IpInterval.parse("11.22.33/22").toRangeString(), is("11.22.32.0 - 11.22.35.255"));
+        assertThat(IpInterval.parse("11.22.33/21").toRangeString(), is("11.22.32.0 - 11.22.39.255"));
+        assertThat(IpInterval.parse("11.22.33/20").toRangeString(), is("11.22.32.0 - 11.22.47.255"));
+        assertThat(IpInterval.parse("11.22.33/19").toRangeString(), is("11.22.32.0 - 11.22.63.255"));
+        assertThat(IpInterval.parse("11.22.33/18").toRangeString(), is("11.22.0.0 - 11.22.63.255"));
+        assertThat(IpInterval.parse("11.22.33/17").toRangeString(), is("11.22.0.0 - 11.22.127.255"));
+        assertThat(IpInterval.parse("11.22.33/16").toRangeString(), is("11.22.0.0 - 11.22.255.255"));
+        assertThat(IpInterval.parse("11.22.33/15").toRangeString(), is("11.22.0.0 - 11.23.255.255"));
+
+        assertThat(IpInterval.parse("0/0").toRangeString(), is("0.0.0.0 - 255.255.255.255"));
+
+        assertThat(IpInterval.parse("212.219.1.0 - 212.219.1.255").toRangeString(), is("212.219.1.0 - 212.219.1.255"));
     }
 
     @Test

@@ -18,8 +18,9 @@ import java.util.regex.Pattern;
  * are stored as signed 32-bit <code>int</code>s. Externally they are
  * represented as <code>long</code>s to avoid issues with the sign-bit.
  */
-public final class Ipv4Interval extends IpInterval<Ipv4Interval> implements Comparable<Ipv4Interval> {
-    public static final String IPV4_REVERSE_DOMAIN = ".in-addr.arpa";
+public class Ipv4Interval extends IpInterval<Ipv4Interval> implements Comparable<Ipv4Interval> {
+    public static final String IPV4_DOTLESS_REVERSE_DOMAIN = ".in-addr.arpa";
+    public static final String IPV4_REVERSE_DOMAIN = ".in-addr.arpa.";
 
     private static final Splitter IPV4_TEXT_SPLITTER = Splitter.on('.');
 
@@ -116,23 +117,38 @@ public final class Ipv4Interval extends IpInterval<Ipv4Interval> implements Comp
         return new Ipv4Interval((prefix & ~mask) & 0xFFFFFFFFL, (prefix | mask) & 0xFFFFFFFFL);
     }
 
+    static int reverseDomainIndex(String cleanAddress) {
+        int withDotIndex = cleanAddress.length() - IPV4_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV4_REVERSE_DOMAIN, withDotIndex)) return withDotIndex;
+
+        int withoutDotIndex = cleanAddress.length() - IPV4_DOTLESS_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV4_DOTLESS_REVERSE_DOMAIN, withDotIndex)) return withoutDotIndex;
+
+        return -1;
+    }
+
     public static Ipv4Interval parseReverseDomain(String address) {
         Validate.notEmpty(address);
-        String cleanAddress = removeTrailingDot(address.trim());
+        String cleanAddress = address.trim().toLowerCase();
 
-        Validate.isTrue(cleanAddress.toLowerCase().endsWith(IPV4_REVERSE_DOMAIN), "Invalid reverse domain: ", address);
+        int reverseDomainIndex = reverseDomainIndex(cleanAddress);
+        Validate.isTrue(reverseDomainIndex >= 0, "Invalid reverse domain: ", address);
 
-        cleanAddress = cleanAddress.substring(0, cleanAddress.length() - IPV4_REVERSE_DOMAIN.length());
+        return parseReverseDomain(cleanAddress, reverseDomainIndex);
+    }
+
+    static Ipv4Interval parseReverseDomain(String cleanAddress, int reverseDomainIndex) {
+        cleanAddress = cleanAddress.substring(0, reverseDomainIndex);
 
         ArrayList<String> reverseParts = Lists.newArrayList(SPLIT_ON_DOT.split(cleanAddress));
-        Validate.isTrue(!reverseParts.isEmpty() && reverseParts.size() <= 4, "Reverse address doesn't have between 1 and 4 octets: ", address);
+        Validate.isTrue(!reverseParts.isEmpty() && reverseParts.size() <= 4, "Reverse address doesn't have between 1 and 4 octets: ", cleanAddress);
 
         List<String> parts = Lists.reverse(reverseParts);
 
         boolean hasDash = false;
         if (cleanAddress.contains("-")) {
-            Validate.isTrue(reverseParts.size() == 4 && reverseParts.get(0).contains("-"), "Dash notation not in 4th octet: ", address);
-            Validate.isTrue(cleanAddress.indexOf('-') == cleanAddress.lastIndexOf('-'), "Only one dash allowed: ", address);
+            Validate.isTrue(reverseParts.get(0).contains("-"), "Dash notation not on last octet: ", cleanAddress);
+            Validate.isTrue(cleanAddress.indexOf('-') == cleanAddress.lastIndexOf('-'), "Only one dash allowed: ", cleanAddress);
             hasDash = true;
         }
 
@@ -260,6 +276,28 @@ public final class Ipv4Interval extends IpInterval<Ipv4Interval> implements Comp
 
     public String toRangeString() {
         return numericToTextFormat(begin) + " - " + numericToTextFormat(end);
+    }
+
+    public String toReverseDomain() {
+        int prefixLength = getPrefixLength();
+        if (prefixLength < 0) throw new IllegalArgumentException("Ipv4Interval " + toRangeString() + " is not a prefix");
+
+        byte[] b = Ints.toByteArray(begin);
+        byte[] e = Ints.toByteArray(end);
+
+        StringBuilder sb = new StringBuilder();
+        // if prefixlength == 0, -1 >> 3 = -1, so this will not run
+        for (int nibble = (prefixLength - 1) >> 3; nibble >= 0; nibble--) {
+            // ' & 0xff' is used to convert unsigned byte to signed int... :facepalm:
+            if (b[nibble] == e[nibble]) sb.append(b[nibble] & 0xff);
+            else sb.append(b[nibble] & 0xff).append('-').append(e[nibble] & 0xff);
+
+            if (nibble > 0) sb.append('.');
+        }
+
+        sb.append(IPV4_REVERSE_DOMAIN);
+
+        return sb.toString();
     }
 
     public String beginAddressAsString() {

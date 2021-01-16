@@ -2,7 +2,6 @@ package com.bol.ipresource.ip;
 
 import com.bol.ipresource.util.Validate;
 import com.google.common.net.InetAddresses;
-import com.google.common.primitives.Longs;
 
 import java.math.BigInteger;
 import java.net.Inet6Address;
@@ -11,12 +10,15 @@ import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
 /**
- * Efficient representation of an IPv6 address range. Internally IPv6 addresses
- * are stored as 2 signed 64-bit <code>long</code>s.
+ * Efficient representation of an IPv6 address range. Internally IPv6 addresses are stored as 2 signed 64-bit <code>long</code>s.
+ * <p>
+ * Note that while ipv6 addresses are always prefixes, this class also allows for ranges that cannot be represented as prefix.
  */
-public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comparable<Ipv6Interval> {
-    public static final String IPV6_REVERSE_DOMAIN = ".ip6.arpa";
+public class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comparable<Ipv6Interval> {
+    public static final String IPV6_DOTLESS_REVERSE_DOMAIN = ".ip6.arpa";
+    public static final String IPV6_REVERSE_DOMAIN = ".ip6.arpa.";
     private static final Pattern REVERSE_PATTERN = Pattern.compile("(?i)^[0-9a-f](?:[.][0-9a-f]){0,31}$");
+    private static final char[] HEX_DIGITS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
     private static final int LONG_BITCOUNT = 64;
     private static final int IPV6_BITCOUNT = 128;
@@ -124,15 +126,31 @@ public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comp
         }
     }
 
+    static int reverseDomainIndex(String cleanAddress) {
+        int withDotIndex = cleanAddress.length() - IPV6_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV6_REVERSE_DOMAIN, withDotIndex)) return withDotIndex;
+
+        int withoutDotIndex = cleanAddress.length() - IPV6_DOTLESS_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV6_DOTLESS_REVERSE_DOMAIN, withDotIndex)) return withoutDotIndex;
+
+        return -1;
+    }
+
     public static Ipv6Interval parseReverseDomain(String address) {
-        Validate.notEmpty(address, "Address cannot be empty");
-        String cleanAddress = removeTrailingDot(address.trim()).toLowerCase();
+        Validate.notEmpty(address);
+        String cleanAddress = address.trim().toLowerCase();
 
-        Validate.isTrue(cleanAddress.endsWith(IPV6_REVERSE_DOMAIN), "Invalid reverse domain: ", address);
+        int reverseDomainIndex = reverseDomainIndex(cleanAddress);
+        Validate.isTrue(reverseDomainIndex >= 0, "Invalid reverse domain: ", address);
 
-        cleanAddress = cleanAddress.substring(0, cleanAddress.length() - IPV6_REVERSE_DOMAIN.length());
+        return parseReverseDomain(cleanAddress, reverseDomainIndex);
+    }
 
-        Validate.isTrue(REVERSE_PATTERN.matcher(cleanAddress).matches(), "Invalid reverse domain: ", address);
+    static Ipv6Interval parseReverseDomain(String cleanAddress, int reverseDomainIndex) {
+        cleanAddress = cleanAddress.substring(0, reverseDomainIndex);
+
+        // FIXME: this translates reverse domain address into a forward address; write a proper parser for performance
+        Validate.isTrue(REVERSE_PATTERN.matcher(cleanAddress).matches(), "Invalid reverse domain: ", cleanAddress);
 
         StringBuilder builder = new StringBuilder();
         int netmask = 0;
@@ -352,6 +370,8 @@ public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comp
     @Override
     public String toString() {
         int prefixLength = getPrefixLength();
+        if (prefixLength < 0) return toRangeString();
+
         StringBuilder sb = new StringBuilder();
         numericToTextFormat(sb, beginMsb, beginLsb, prefixLength);
         sb.append('/').append(prefixLength);
@@ -366,6 +386,33 @@ public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comp
         numericToTextFormat(sb, endMsb, endLsb, 128);
         return sb.toString();
     }
+
+    public String toReverseDomain() {
+        int prefixLength = getPrefixLength();
+        if (prefixLength < 0) throw new IllegalArgumentException("Ipv6Interval " + toRangeString() + " is not a prefix");
+
+        StringBuilder sb = new StringBuilder();
+        // if prefixlength == 0, -1 >> 3 = -1, so this will not run
+        for (int digit = 31 - ((prefixLength - 1) >> 2); digit < 32; digit++) {
+            int b = reverseDomainDigit(beginMsb, beginLsb, digit);
+            int e = reverseDomainDigit(endMsb, endLsb, digit);
+            if (b == e) sb.append(HEX_DIGITS[b]);
+            else sb.append(HEX_DIGITS[b]).append('-').append(HEX_DIGITS[e]);
+
+            if (digit < 31) sb.append('.');
+        }
+
+        sb.append(IPV6_REVERSE_DOMAIN);
+
+        return sb.toString();
+    }
+
+    // ipv6 address in reverse domain format consists of 32 hexadecimal digits
+    int reverseDomainDigit(long msb, long lsb, int digit) {
+        if (digit < 16) return (int) ((lsb >> (digit * 4))) & 0xf;
+        else return (int) ((msb >> (digit - 16) * 4)) & 0xf;
+    }
+
 
     @Override
     public String beginAddressAsString() {
@@ -414,5 +461,4 @@ public final class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comp
     public static long msb(BigInteger begin) {
         return begin.shiftRight(LONG_BITCOUNT).longValue();
     }
-
 }

@@ -5,7 +5,7 @@ import com.bol.ipresource.util.Validate;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 
-public abstract class IpInterval<K extends Interval<K>> implements Interval<K> {
+public abstract class IpInterval<K> implements Interval<K> {
     public static IpInterval<?> parse(String addressPrefixOrRange) {
         if (addressPrefixOrRange.indexOf(':') == -1) {
             return Ipv4Interval.parse(addressPrefixOrRange);
@@ -44,14 +44,23 @@ public abstract class IpInterval<K extends Interval<K>> implements Interval<K> {
     }
 
     /**
-     * returns a fully qualifies reverse domain, with trailing dot, e.g. 66.152.in-addr.arpa.
+     * @returns a fully qualifies reverse domain, with trailing dot, e.g. 66.152.in-addr.arpa.
      */
     public abstract String toReverseDomain();
 
+    /**
+     * @returns same as `toString()`, but forced into range format ("X - Y")
+     */
     public abstract String toRangeString();
 
+    /**
+     * @returns `toString()` on the begin address of this interval
+     */
     public abstract String beginAddressAsString();
 
+    /**
+     * @returns `toString()` on the end address of this interval
+     */
     public abstract String endAddressAsString();
 
     public abstract InetAddress beginAsInetAddress();

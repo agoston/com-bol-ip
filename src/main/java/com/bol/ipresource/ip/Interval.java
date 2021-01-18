@@ -12,7 +12,7 @@ import com.bol.ipresource.etree.NestedIntervalMap;
  *
  * @param <K> the interval type
  */
-public interface Interval<K extends Interval<K>> {
+public interface Interval<K> {
 
     /**
      * Tests if this interval contains <code>that</code>. Note that if two

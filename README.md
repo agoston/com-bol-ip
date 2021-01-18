@@ -6,6 +6,7 @@ Originally developed during my work at [RIPE NCC](http://ripe.net), we needed an
 
 * was high performance
 * had minimal memory footprint
+* has no dependencies
 * supported addresses, ranges, prefixes
 * supported contains/intersect operations
 * had a natural tree support

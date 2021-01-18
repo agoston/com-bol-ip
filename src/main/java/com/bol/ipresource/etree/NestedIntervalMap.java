@@ -3,7 +3,6 @@ package com.bol.ipresource.etree;
 import com.bol.ipresource.ip.Interval;
 import com.bol.ipresource.util.CollectionHelper;
 import com.bol.ipresource.util.Validate;
-import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -152,7 +151,7 @@ public final class NestedIntervalMap<K extends Interval<K>, V> implements Interv
     }
 
     private List<V> mapToValues(Collection<InternalNode<K, V>> nodes) {
-        List<V> result = Lists.newArrayListWithExpectedSize(nodes.size());
+        List<V> result = new ArrayList<>(nodes.size() + 5);
         for (InternalNode<K, V> node : nodes) {
             result.add(node.getValue());
         }

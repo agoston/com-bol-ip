@@ -85,4 +85,9 @@ public class IpTree<V> implements IntervalMap<IpInterval<?>, V> {
         if (key.getClass() == Ipv4Interval.class) return ipv4Tree.findExactAndAllMoreSpecific((Ipv4Interval) key);
         else return ipv6Tree.findExactAndAllMoreSpecific((Ipv6Interval) key);
     }
+
+    @Override
+    public String toString() {
+        return ipv4Tree.toString() + ", " + ipv6Tree.toString();
+    }
 }

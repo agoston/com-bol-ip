@@ -46,16 +46,16 @@ public final class NestedIntervalMap<K extends Interval<K>, V> implements Interv
     }
 
     @Override
-    public void put(K key, V value) {
+    public V put(K key, V value) {
         Validate.notNull(key);
         Validate.notNull(value);
-        children.addChild(new InternalNode<>(key, value));
+        return children.addChild(new InternalNode<>(key, value));
     }
 
     @Override
-    public void remove(K key) {
+    public V remove(K key) {
         Validate.notNull(key);
-        children.removeChild(key);
+        return children.removeChild(key);
     }
 
     @Override

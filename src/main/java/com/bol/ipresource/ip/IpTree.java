@@ -15,15 +15,15 @@ public class IpTree<V> implements IntervalMap<IpInterval<?>, V> {
     protected NestedIntervalMap<Ipv6Interval, V> ipv6Tree = new NestedIntervalMap<>();
 
     @Override
-    public void put(IpInterval<?> key, V value) {
-        if (key.getClass() == Ipv4Interval.class) ipv4Tree.put((Ipv4Interval) key, value);
-        else ipv6Tree.put((Ipv6Interval) key, value);
+    public V put(IpInterval<?> key, V value) {
+        if (key.getClass() == Ipv4Interval.class) return ipv4Tree.put((Ipv4Interval) key, value);
+        else return ipv6Tree.put((Ipv6Interval) key, value);
     }
 
     @Override
-    public void remove(IpInterval<?> key) {
-        if (key.getClass() == Ipv4Interval.class) ipv4Tree.remove((Ipv4Interval) key);
-        else ipv6Tree.remove((Ipv6Interval) key);
+    public V remove(IpInterval<?> key) {
+        if (key.getClass() == Ipv4Interval.class) return ipv4Tree.remove((Ipv4Interval) key);
+        else return ipv6Tree.remove((Ipv6Interval) key);
     }
 
     @Override

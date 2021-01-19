@@ -28,16 +28,16 @@ public final class SynchronizedIntervalMap<K extends Interval<K>, V> implements 
     }
 
     @Override
-    public void put(K key, V value) {
+    public V put(K key, V value) {
         synchronized (mutex) {
-            wrapped.put(key, value);
+            return wrapped.put(key, value);
         }
     }
 
     @Override
-    public void remove(K key) {
+    public V remove(K key) {
         synchronized (mutex) {
-            wrapped.remove(key);
+            return wrapped.remove(key);
         }
     }
 

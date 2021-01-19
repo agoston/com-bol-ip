@@ -9,12 +9,14 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 public class NestedIntervalMapTest {
@@ -92,7 +94,8 @@ public class NestedIntervalMapTest {
 
     @Test
     public void test_remove_n1_10() {
-        subject.remove(N1_12);
+        Ipv4Interval removed = subject.remove(N1_12);
+        assertThat(removed, is(N1_12));
         assertThat(subject.findExact(N1_12), hasSize(0));
         assertThat(subject.findFirstMoreSpecific(N1_12), contains(N1_4, N5_10, N11_12));
     }
@@ -100,7 +103,8 @@ public class NestedIntervalMapTest {
     @Test
     public void test_remove_n5_8() {
         assertEquals(asList(N5_5, N6_6, N7_7), subject.findFirstMoreSpecific(N5_8));
-        subject.remove(N5_8);
+        Ipv4Interval removed = subject.remove(N5_8);
+        assertThat(removed, is(N5_8));
         assertThat(subject.findExact(N5_8), hasSize(0));
         assertThat(subject.findFirstMoreSpecific(N5_8), contains(N5_5, N6_6, N7_7));
     }
@@ -126,13 +130,16 @@ public class NestedIntervalMapTest {
     public void test_remove_nonexistant() {
         NestedIntervalMap<Ipv4Interval, Ipv4Interval> copy = new NestedIntervalMap<>(subject);
 
-        subject.remove(new Ipv4Interval(0, 100));
+        Ipv4Interval N0_100 = subject.remove(new Ipv4Interval(0, 100));
+        assertThat(N0_100, is(nullValue()));
         assertEquals(copy, subject);
 
-        subject.remove(new Ipv4Interval(1, 7));
+        Ipv4Interval N1_7 = subject.remove(new Ipv4Interval(1, 7));
+        assertThat(N1_7, is(nullValue()));
         assertEquals(copy, subject);
 
-        subject.remove(new Ipv4Interval(12, 12));
+        Ipv4Interval N12_12 = subject.remove(new Ipv4Interval(12, 12));
+        assertThat(N12_12, is(nullValue()));
         assertEquals(copy, subject);
     }
 

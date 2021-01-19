@@ -24,8 +24,9 @@ public interface IntervalMap<K extends Interval<?>, V> {
      * @throws IllegalArgumentException     if the key or value is <code>null</code>
      * @throws IntersectingIntervalException if the key intersects (but is not contained within) an existing
      *                                      key
+     * @return the replaced value, if applies. null otherwise.
      */
-    void put(K key, V value);
+    V put(K key, V value);
 
     /**
      * Removes the mapping for a key from this map if it is present.
@@ -36,8 +37,9 @@ public interface IntervalMap<K extends Interval<?>, V> {
      *
      * @param key key whose mapping is to be removed from the map
      * @throws IllegalArgumentException if the specified key is null
+     * @return the value of the removed key
      */
-    void remove(K key);
+    V remove(K key);
 
     /**
      * Removes the mapping for a key and value from this map if both are present.

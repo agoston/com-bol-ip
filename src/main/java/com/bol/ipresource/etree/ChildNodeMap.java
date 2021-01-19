@@ -14,9 +14,9 @@ import java.util.List;
  */
 interface ChildNodeMap<K extends Interval<K>, V> {
 
-    void addChild(InternalNode<K, V> nodeToAdd);
+    V addChild(InternalNode<K, V> nodeToAdd);
 
-    void removeChild(K interval);
+    V removeChild(K interval);
 
     void findExactAndAllLessSpecific(List<InternalNode<K, V>> list, K interval);
 

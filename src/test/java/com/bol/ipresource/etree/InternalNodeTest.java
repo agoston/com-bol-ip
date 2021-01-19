@@ -4,6 +4,8 @@ import com.bol.ipresource.ip.Ipv4Interval;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
@@ -47,4 +49,11 @@ public class InternalNodeTest {
         c.removeChild(e.getInterval());
     }
 
+    @Test
+    public void replace_remove_returns_old_value() {
+        String replaced = d.addChild(new InternalNode<>(new Ipv4Interval(1, 2), "new"));
+        assertThat(replaced, is("1-2"));
+        String removed = d.removeChild(new Ipv4Interval(1,2));
+        assertThat(removed, is("new"));
+    }
 }

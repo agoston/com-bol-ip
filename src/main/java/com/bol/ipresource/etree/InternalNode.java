@@ -67,28 +67,33 @@ final class InternalNode<K extends Interval<K>, V> {
         return children;
     }
 
-    void addChild(InternalNode<K, V> nodeToAdd) {
+    V addChild(InternalNode<K, V> nodeToAdd) {
         if (interval.equals(nodeToAdd.getInterval())) {
-            this.value = nodeToAdd.getValue();
+            V previousValue = value;
+            value = nodeToAdd.getValue();
+            return previousValue;
         } else if (!interval.contains(nodeToAdd.getInterval())) {
             throw new IllegalArgumentException(nodeToAdd.getInterval() + " not properly contained in " + interval);
         } else {
             if (children == ChildNodeTreeMap.EMPTY) {
                 children = new ChildNodeTreeMap<>();
             }
-            children.addChild(nodeToAdd);
+            return children.addChild(nodeToAdd);
         }
     }
 
-    public void removeChild(K range) {
+    public V removeChild(K range) {
         if (!interval.contains(range) || interval.equals(range)) {
             throw new IllegalArgumentException(range + " not properly contained in " + interval);
         }
         if (children != ChildNodeTreeMap.EMPTY) {
-            children.removeChild(range);
+            V value = children.removeChild(range);
             if (children.isEmpty()) {
                 children = ChildNodeTreeMap.empty();
             }
+            return value;
+        } else {
+            return null;
         }
     }
 }

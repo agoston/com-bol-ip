@@ -16,7 +16,7 @@ public final class MultiValueIntervalMap<K extends Interval<K>, V> implements In
     }
 
     @Override
-    public void put(K key, V value) {
+    public V put(K key, V value) {
         SortedSet<V> set = CollectionHelper.uniqueResult(wrapped.findExact(key));
         if (set == null) {
             set = new TreeSet<>();
@@ -24,11 +24,17 @@ public final class MultiValueIntervalMap<K extends Interval<K>, V> implements In
         }
 
         set.add(value);
+
+        // there is no key 'replaced'; return value always null
+        return null;
     }
 
     @Override
-    public void remove(K key) {
+    public V remove(K key) {
         wrapped.remove(key);
+
+        // return value possibly multiple keys; return value always null for consistency
+        return null;
     }
 
     @Override

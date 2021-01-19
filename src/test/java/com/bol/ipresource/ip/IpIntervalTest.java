@@ -28,8 +28,8 @@ public class IpIntervalTest {
 
     @Test
     public void parseReverseDomain() {
-        assertThat(IpInterval.parseReverseDomain("0.0.193.in-ADDR.arpA.").toString(), is("193.0.0.0/24"));
-        assertThat(IpInterval.parseReverseDomain("a.b.0.0.1.iP6.arpA.").toString(), is("100b:a000::/20"));
+        assertThat(IpInterval.parseReverseDomain("0.0.193.in-ADDR.arpA").toString(), is("193.0.0.0/24"));
+        assertThat(IpInterval.parseReverseDomain("a.b.0.0.1.iP6.arpA").toString(), is("100b:a000::/20"));
         assertThat(IpInterval.parseReverseDomain("0.0.193.in-ADDR.arpA.").toString(), is("193.0.0.0/24"));
         assertThat(IpInterval.parseReverseDomain("a.b.0.0.1.iP6.arpA.").toString(), is("100b:a000::/20"));
     }

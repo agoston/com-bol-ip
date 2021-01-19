@@ -127,11 +127,11 @@ public class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comparable
     }
 
     static int reverseDomainIndex(String cleanAddress) {
-        int withDotIndex = cleanAddress.length() - IPV6_REVERSE_DOMAIN.length();
-        if (cleanAddress.startsWith(IPV6_REVERSE_DOMAIN, withDotIndex)) return withDotIndex;
+        int index = cleanAddress.length() - IPV6_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV6_REVERSE_DOMAIN, index)) return index;
 
-        int withoutDotIndex = cleanAddress.length() - IPV6_DOTLESS_REVERSE_DOMAIN.length();
-        if (cleanAddress.startsWith(IPV6_DOTLESS_REVERSE_DOMAIN, withDotIndex)) return withoutDotIndex;
+        index = cleanAddress.length() - IPV6_DOTLESS_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV6_DOTLESS_REVERSE_DOMAIN, index)) return index;
 
         return -1;
     }

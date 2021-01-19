@@ -7,7 +7,7 @@
     <artifactId>ip-resource</artifactId>
     <packaging>jar</packaging>
     <name>ip-resource</name>
-    <version>1.4.0</version>
+    <version>1.4.1</version>
     <description>High performance, low memory IP library (originally developed for RIPE NCC Whois server)</description>
     <url>https://github.com/agoston/com-bol-ip</url>
     <licenses>

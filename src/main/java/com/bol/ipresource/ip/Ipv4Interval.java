@@ -118,11 +118,11 @@ public class Ipv4Interval extends IpInterval<Ipv4Interval> implements Comparable
     }
 
     static int reverseDomainIndex(String cleanAddress) {
-        int withDotIndex = cleanAddress.length() - IPV4_REVERSE_DOMAIN.length();
-        if (cleanAddress.startsWith(IPV4_REVERSE_DOMAIN, withDotIndex)) return withDotIndex;
+        int index = cleanAddress.length() - IPV4_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV4_REVERSE_DOMAIN, index)) return index;
 
-        int withoutDotIndex = cleanAddress.length() - IPV4_DOTLESS_REVERSE_DOMAIN.length();
-        if (cleanAddress.startsWith(IPV4_DOTLESS_REVERSE_DOMAIN, withDotIndex)) return withoutDotIndex;
+        index = cleanAddress.length() - IPV4_DOTLESS_REVERSE_DOMAIN.length();
+        if (cleanAddress.startsWith(IPV4_DOTLESS_REVERSE_DOMAIN, index)) return index;
 
         return -1;
     }

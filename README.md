@@ -27,7 +27,7 @@ Add the following to `pom.xml`:
         <dependency>
             <groupId>com.bol</groupId>
             <artifactId>ip-resource</artifactId>
-            <version>1.4.1</version>
+            <version>1.4.2</version>
         </dependency>
 ```
 

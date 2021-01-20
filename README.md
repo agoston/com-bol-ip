@@ -61,6 +61,6 @@ To use highly efficient IP interval trees for access control:
         boolean allow = map.findFirstLessSpecific(new Ipv4Interval(incomingSocket.getInetAddress()));
         [...]
 ```
-The above code would first build an IP tree where default is not allowed to connect (`false`), range `192.168/19` is allowed (`true`), but inside that range, `192.168.52.1` is excluded once more (`false`). Then we use the `findFirstLessSpecific()` method of the tree on a connecting client's IP address to find the best match for its IP.
+The above code would first build an IP tree where default is not allowed to connect (`0/0` has value `false`); range `192.168/19` is allowed (`true`), but then  inside that range, `192.168.52.1` is excluded once more (`false`). Then we use the `findFirstLessSpecific()` method of the tree on a connecting client's IP address to find the best match for its IP.
 
 Of course this is just a small example, there is full IPv6 support & a lot more hierarchical lookup support, feel free to peek inside!

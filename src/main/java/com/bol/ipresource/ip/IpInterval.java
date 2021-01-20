@@ -14,12 +14,12 @@ public abstract class IpInterval<K> implements Interval<K> {
         return Ipv6Interval.parse(addressPrefixOrRange);
     }
 
-    public static IpInterval<?> parseAddress(String address) {
+    public static IpInterval<?> parseIpAddress(String address) {
         if (address.indexOf(':') == -1) {
-            return Ipv4Interval.parseAddress(address);
+            return Ipv4Interval.parseIpAddress(address);
         }
 
-        return Ipv6Interval.parseAddress(address);
+        return Ipv6Interval.parseIpAddress(address);
     }
 
     public static IpInterval<?> parseReverseDomain(String reverse) {

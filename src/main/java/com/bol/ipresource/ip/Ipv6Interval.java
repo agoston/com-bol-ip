@@ -126,6 +126,11 @@ public class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comparable
         }
     }
 
+    public static Ipv6Interval parseIpAddress(String ipAddress) {
+        String trimmedPrefixOrAddress = ipAddress.trim();
+        return parse(InetAddresses.forString(trimmedPrefixOrAddress), IPV6_BITCOUNT);
+    }
+
     static int reverseDomainIndex(String cleanAddress) {
         int index = cleanAddress.length() - IPV6_REVERSE_DOMAIN.length();
         if (cleanAddress.startsWith(IPV6_REVERSE_DOMAIN, index)) return index;

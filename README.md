@@ -1,4 +1,5 @@
 [![Maven Central](https://img.shields.io/maven-central/v/com.bol/ip-resource.svg)](http://search.maven.org/#search%7Cga%7C1%7Ccom.bol)
+[![Build](https://github.com/bolcom/com-bol-ip/actions/workflows/maven.yml/badge.svg)](https://github.com/bolcom/com-bol-ip/actions)
 
 # IP Resource origins
 

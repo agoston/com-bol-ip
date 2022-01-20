@@ -54,6 +54,11 @@ public abstract class IpInterval<K> implements Interval<K> {
     public abstract String toRangeString();
 
     /**
+     * @returns same as `toString()`, but forced into prefix format ("X/Y")
+     */
+    public abstract String toPrefixString();
+
+    /**
      * @returns `toString()` on the begin address of this interval
      */
     public abstract String beginAddressAsString();

@@ -278,6 +278,13 @@ public class Ipv4Interval extends IpInterval<Ipv4Interval> implements Comparable
         return numericToTextFormat(begin) + " - " + numericToTextFormat(end);
     }
 
+    @Override
+    public String toPrefixString() {
+        int prefixLength = getPrefixLength();
+        if (prefixLength < 0) throw new IllegalStateException(toRangeString() + " cannot be converted to prefix");
+        return numericToTextFormat(begin) + "/" + prefixLength;
+    }
+
     public String toReverseDomain() {
         int prefixLength = getPrefixLength();
         if (prefixLength < 0) throw new IllegalArgumentException("Ipv4Interval " + toRangeString() + " is not a prefix");

@@ -392,6 +392,17 @@ public class Ipv6Interval extends IpInterval<Ipv6Interval> implements Comparable
         return sb.toString();
     }
 
+    @Override
+    public String toPrefixString() {
+        int prefixLength = getPrefixLength();
+        if (prefixLength < 0) throw new IllegalStateException(toRangeString() + " cannot be converted to prefix");
+
+        StringBuilder sb = new StringBuilder();
+        numericToTextFormat(sb, beginMsb, beginLsb, prefixLength);
+        sb.append('/').append(prefixLength);
+        return sb.toString();
+    }
+
     public String toReverseDomain() {
         int prefixLength = getPrefixLength();
         if (prefixLength < 0) throw new IllegalArgumentException("Ipv6Interval " + toRangeString() + " is not a prefix");
